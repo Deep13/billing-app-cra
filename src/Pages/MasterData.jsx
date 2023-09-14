@@ -52,13 +52,14 @@ const MasterData = () => {
                         </button>
                         {
                             (record.desc === item) ?
-                                <div className="flex gap-4">
-                                    <button onClick={() => deleteItem(record)} className="btn btn-primary">confirm</button>
+                                <>
+                                    <button onClick={() => deleteItem(record)} className="btn btn-primary ms-1 me-2">confirm</button>
                                     <button onClick={() => {
                                         setitem(null)
                                         setConfirmDelete(false)
                                     }} className="btn btn-danger">Cancel</button>
-                                </div>
+                                </>
+
                                 :
                                 <button
                                     onClick={() => {
