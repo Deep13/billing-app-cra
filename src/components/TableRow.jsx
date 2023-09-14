@@ -5,6 +5,10 @@ const TableRow = ({
     desc,
     pcs,
     gross,
+    stWt = 2,
+    stVal = 2000,
+    fixed_charges = 5000,
+    hsn = '01a2e',
     net,
     amount,
     making_charges,
@@ -29,6 +33,18 @@ const TableRow = ({
             </td>
             <td>
                 <input className='form-control' placeholder={amount} onChange={handleOnEnterAnyData} type="text" />
+            </td>
+            <td>
+                <input className='form-control' placeholder={stWt} onChange={handleOnEnterAnyData} type="text" />
+            </td>
+            <td>
+                <input className='form-control' placeholder={stVal} onChange={handleOnEnterAnyData} type="text" />
+            </td>
+            <td>
+                <input className='form-control' placeholder={hsn} onChange={handleOnEnterAnyData} type="text" />
+            </td>
+            <td>
+                <input className='form-control' placeholder={making_charges} onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
                 <input className='form-control' placeholder={making_charges} onChange={handleOnEnterAnyData} type="text" />

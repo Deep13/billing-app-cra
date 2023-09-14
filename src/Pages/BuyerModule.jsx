@@ -506,16 +506,19 @@ const BuyerModule = () => {
                             <table className="table table-center table-hover datatable">
                               <thead className="thead-light">
                                 <tr>
-                                  <th>Product / Service</th>
-                                  {/* <th>Type</th>
-                                  <th>Purity</th>
-                                  <th>Rate</th> */}
+                                  <th>Code</th>
                                   <th>Description</th>
                                   <th>Pcs</th>
                                   <th>Gross.</th>
                                   <th>Net</th>
+                                  {/* <th>Value</th> */}
+                                  <th>Making</th>
+                                  <th>St. wt</th>
+                                  <th>St. Val</th>
+                                  <th>Fxd Chrgs</th>
                                   <th>Amount</th>
-                                  <th>Making charges</th>
+                                  <th>Hsn</th>
+                                  {/* <th>Making charges</th> */}
                                   <th>Action</th>
                                 </tr>
                               </thead>
