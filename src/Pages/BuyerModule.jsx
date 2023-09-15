@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Header from "../components/Navbar";
@@ -13,10 +13,55 @@ import TableRow from "../components/TableRow";
 const BuyerModule = () => {
   const [menu, setMenu] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
-
+  const navigate = useNavigate()
   const toggleMobileMenu = () => {
     setMenu(!menu);
   };
+
+  const [invoiceData, setInvoiceData] = useState({
+    ContactNumber: '800332182325',
+    CustomerName: 'Mohit',
+    IdType: 'PAN',
+    CardNumber: '2245038',
+    Address: 'Home',
+    DueDate: '',
+    State: 'West Bengal',
+    InovoiceDate: '',
+    GstNumber: '',
+    CityPin: '341510',
+    items: [
+      {
+        product: 'Gold  Chain',
+        type: 'gold ornament',
+        purity: 0,
+        rate: 0,
+        desc: 'very good',
+        pcs: 0,
+        gross: 0,
+        net: 0,
+        amount: 0,
+        making_chares: 0,
+      },
+      {
+        product: 'Platinum ring',
+        type: 'platinum ornament',
+        purity: 0,
+        rate: 0,
+        desc: 'good one',
+        pcs: 3,
+        gross: 45,
+        net: 64,
+        amount: 18500,
+        making_chares: 20000,
+      },
+    ],
+    PaymentMode: 'Cash',
+    Notes: '',
+    DiscountedPrice: '145000',
+    CGst: '5%',
+    SGst: '5%',
+    TotalAmount: '165000',
+  })
 
   const [addProduct, setAddProduct] = useState(false)
   const [disable, setDisable] = useState(false)
@@ -767,7 +812,10 @@ const BuyerModule = () => {
                       >
                         Cancel
                       </button>
-                      <button onClick={() => setDisable(true)} type="submit" className="btn btn-primary">
+                      <button onClick={() => {
+                        setDisable(true)
+                        navigate('/invoice', { state: { invoiceData } })
+                      }} type="submit" className="btn btn-primary">
                         Save Changes
                       </button>
                     </div>

@@ -5,3 +5,12 @@
 input {
   color: black !important;
 }
+
+@media print {
+  #printable {
+    display: block;
+  }
+  #nonPrintable {
+    display: none;
+  }
+}

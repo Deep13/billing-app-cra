@@ -13,6 +13,7 @@ import IdentificationType from './Pages/MasterDataPages/IdentificationType'
 import Purity from './Pages/MasterDataPages/Purity'
 import StateCode from './Pages/MasterDataPages/StateCode'
 import TokenEntry from './Pages/MasterDataPages/TokenEntry'
+import InvoiceFormat from './components/InvoiceFormat'
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
           <Route index element={<Ornament />} />
           <Route index={false} path='ornament-type' element={<OrnamentType />} />
           <Route path='gst-entry' element={<GSTEntry />} />
+          <Route path='invoice' element={<InvoiceFormat />} />
           <Route path='hm-charge' element={<HMCharge />} />
           <Route path='hsn-code' element={<HSNCode />} />
           <Route path='identification-type' element={<IdentificationType />} />
