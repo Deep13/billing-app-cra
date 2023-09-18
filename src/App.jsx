@@ -21,7 +21,7 @@ function App() {
     <>
       <div className='h-[100vh] w-full'>
         <Routes>
-          <Route path='/' element={<Login />} />
+          <Route path='/billing/' element={<Login />} />
           {/* <Route path='/login' element={<Login />} /> */}
           <Route path='/stock-management' element={<StockManagement />} />
           <Route path='/master-data' element={<MasterData />} >
@@ -35,7 +35,7 @@ function App() {
             <Route path='purity' element={<Purity />} />
             <Route path='token-entry' element={<TokenEntry />} /> */}
           </Route>
-          <Route index element={<Ornament />} />
+          <Route index element={<MasterData />} />
           <Route index={false} path='ornament-type' element={<OrnamentType />} />
           <Route path='gst-entry' element={<GSTEntry />} />
           <Route path='invoice' element={<InvoiceFormat />} />

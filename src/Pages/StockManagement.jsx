@@ -1,24 +1,28 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import FeatherIcon from "feather-icons-react";
-import Data from "./inventory";
+// import Data from "./inventory";
 import "../components/antd.css";
 import { Table } from "antd";
 import Select2 from '../components/SelectDropdown'
 
-import {
-  onShowSizeChange,
-  itemRender,
-} from "../components/paginationfunction";
+// import {
+//   onShowSizeChange,
+//   itemRender,
+// } from "../components/paginationfunction";
 import AddVendor from "../vendors/addVendor";
 // import Select2 from "react-select2-wrapper";
 
 const StockManagement = () => {
 
-  const datasource = Data?.Data;
-  console.log(datasource);
+  // const datasource = Data?.Data;
+  // console.log(datasource);
+  const [purityData, setPurityData] = useState([])
+  const [ornamentType, setOrnamentType] = useState([])
+
+
   const [data, setData] = useState([{
     Id: '1',
     EntryDate: new Date().toLocaleDateString(),
@@ -193,15 +197,71 @@ const StockManagement = () => {
   ];
 
 
-  const ItemRef = useRef()
-  const DateRef = useRef()
-  const OmCodeRef = useRef()
-  const GrossWtRef = useRef()
-  const StoneWtRef = useRef()
-  const HUIDRef = useRef()
-  const NetWtRef = useRef()
-  const QuantityRef = useRef()
-  const OrnamentDescRef = useRef()
+
+  // const ItemRef = useRef()
+  // const DateRef = useRef()
+  // const OmCodeRef = useRef()
+  // const GrossWtRef = useRef()
+  // const StoneWtRef = useRef()
+  // const HUIDRef = useRef()
+  // const NetWtRef = useRef()
+  // const QuantityRef = useRef()
+  // const OrnamentDescRef = useRef()
+
+
+
+  useEffect(() => {
+    refreshData();
+  }, [])
+
+  const refreshData = () => {
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "getPurity",
+      },
+      success: function (dataClient) {
+        try {
+          // setdatasource(JSON.parse(dataClient))
+          setPurityData(JSON.parse(dataClient))
+          console.log(JSON.parse(dataClient))
+        } catch (e) {
+          // setdatasource([])
+          setPurity([])
+          console.log(e)
+        }
+        console.log(dataClient);
+      },
+      error: function (request, error) {
+        console.log('Error')
+      },
+    });
+
+    // for ornament 
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "getOrnament",
+      },
+      success: function (dataClient) {
+        try {
+          // setdatasource(JSON.parse(dataClient))
+          setOrnamentType(JSON.parse(dataClient))
+          console.log(JSON.parse(dataClient))
+        } catch (e) {
+          // setdatasource([])
+          setOrnamentType([])
+          console.log(e)
+        }
+        console.log(dataClient);
+      },
+      error: function (request, error) {
+        console.log('Error')
+      },
+    });
+  }
 
   return (
     <>
@@ -325,6 +385,18 @@ const StockManagement = () => {
                       />
                     </div>
                   </div>
+
+                  <div className="col-lg-6 col-md-12">
+                    <div className="form-group mb-0">
+                      <label>Ornament Desc</label>
+                      <Select2
+                        type="text"
+                        data={ornamentType}
+                        className="form-control"
+                      />
+                    </div>
+                  </div>
+
                   <div className="col-lg-6 col-md-12">
                     <div className="form-group">
                       <label>Om Code</label>
@@ -334,15 +406,19 @@ const StockManagement = () => {
                       />
                     </div>
                   </div>
+
                   <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>Item</label>
-                      <input
-                        type="text"
+                    <div className="form-group mb-0">
+                      <label>Purity</label>
+                      <Select2
+                        onChange={handlePurityChange}
                         className="form-control"
+                        data={purityData}
                       />
                     </div>
                   </div>
+
+
                   <div className="col-lg-6 col-md-12">
                     <div className="form-group">
                       <label>Gross Wt</label>
@@ -352,24 +428,7 @@ const StockManagement = () => {
                       />
                     </div>
                   </div>
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>Stone Wt</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>HUID</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                      />
-                    </div>
-                  </div>
+
                   <div className="col-lg-6 col-md-12">
                     <div className="form-group">
                       <label>Net Wt</label>
@@ -379,6 +438,18 @@ const StockManagement = () => {
                       />
                     </div>
                   </div>
+
+                  <div className="col-lg-6 col-md-12">
+                    <div className="form-group">
+                      <label>Stone Wt</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                      />
+                    </div>
+                  </div>
+
+
                   <div className="col-lg-6 col-md-12">
                     <div className="form-group mb-0">
                       <label>Quantity</label>
@@ -388,27 +459,22 @@ const StockManagement = () => {
                       />
                     </div>
                   </div>
+
+
                   <div className="col-lg-6 col-md-12">
-                    <div className="form-group mb-0">
-                      <label>Purity</label>
-                      <Select2
-                        onChange={handlePurityChange}
-                        className="form-control"
-                        data={purityType}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group mb-0">
-                      <label>Ornament Desc</label>
+                    <div className="form-group">
+                      <label>HUID</label>
                       <input
                         type="text"
                         className="form-control"
                       />
                     </div>
                   </div>
+
+
                 </div>
               </div>
+
               <div className="modal-footer">
                 <Link
                   to="#"

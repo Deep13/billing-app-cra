@@ -53,7 +53,7 @@ const Login = (props) => {
             })
         } else {
             clearErrors('password')
-            navigate('/daily-Expenses')
+            navigate('/master-data')
 
         }
     }

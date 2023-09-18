@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -19,9 +19,32 @@ const MasterData = () => {
     const [menu, setMenu] = useState(false);
     const [item, setitem] = useState(null);
     const [selectedItem, setselectedItem] = useState(null);
-    const [show, setShow] = useState(false);
-    const [confirmDelete, setConfirmDelete] = useState(false)
-    const [datasource, setdatasource] = useState([{ id: 1, desc: 'GOLD' }, { id: 2, desc: 'SILVER' }, { id: 3, desc: 'OTHERS' }]);
+    const [toBeDeleteItem, setToBeDeleteItem] = useState(null);
+    // const [show, setShow] = useState(false);
+    // const [confirmDelete, setConfirmDelete] = useState(false)
+    const [datasource, setdatasource] = useState([]);
+    useEffect(() => {
+        refreshData();
+    }, [])
+
+    const refreshData = () => {
+        $.ajax({
+            url: 'http://localhost:80/billing_api/index.php',
+            type: "POST",
+            data: {
+                method: "getOrnament",
+            },
+            success: function (dataClient) {
+                setdatasource(JSON.parse(dataClient));
+                console.log(JSON.parse(dataClient));
+            },
+            error: function (request, error) {
+                console.log('Error')
+            },
+        });
+    }
+
+
 
     const toggleMobileMenu = () => {
         setMenu(!menu);
@@ -35,8 +58,8 @@ const MasterData = () => {
         },
         {
             title: "Item",
-            dataIndex: "desc",
-            sorter: (a, b) => a.desc.length - b.desc.length,
+            dataIndex: "item",
+            sorter: (a, b) => a.item.length - b.item.length,
         },
         {
             title: "Action",
@@ -51,12 +74,12 @@ const MasterData = () => {
                             Edit
                         </button>
                         {
-                            (record.desc === item) ?
+                            (record.item === toBeDeleteItem) ?
                                 <>
                                     <button onClick={() => deleteItem(record)} className="btn btn-primary ms-1 me-2">confirm</button>
                                     <button onClick={() => {
                                         setitem(null)
-                                        setConfirmDelete(false)
+                                        // setConfirmDelete(false)
                                     }} className="btn btn-danger">Cancel</button>
                                 </>
 
@@ -64,9 +87,10 @@ const MasterData = () => {
                                 <button
                                     onClick={() => {
                                         // console.log(record)
-                                        setitem(record.desc)
+                                        // setitem(record.item)
                                         // setConfirmDelete(true)
                                         // deleteItem(record)
+                                        setToBeDeleteItem(record.item)
                                     }}
                                     // onClick={AddItemToTable}
                                     className="btn btn-danger gap-2">
@@ -83,8 +107,8 @@ const MasterData = () => {
     const handleAddItem = () => {
         if (selectedItem) {
             var editValue = datasource.filter(val => {
-                if (val.id == selectedItem.id) {
-                    val.desc = item
+                if (val.id === selectedItem.id) {
+                    val.item = item
                 }
                 return val
             });
@@ -92,10 +116,29 @@ const MasterData = () => {
             setdatasource([...editValue]);
         }
         else {
-            var lastIndex = datasource.length;
-            setdatasource([...datasource, { id: lastIndex, desc: item }])
+            // var lastIndex = datasource.length;
+            // setdatasource([...datasource, { Id: lastIndex, Item: item }])
+            $.ajax({
+                url: 'http://localhost:80/billing_api/index.php',
+                type: "POST",
+                data: {
+                    method: "insertOrnament",
+                    data: JSON.stringify({ item: item }),
+                },
+                success: function (dataClient) {
+                    console.log(dataClient);
+                    refreshData();
+                },
+                error: function (request, error) {
+                    console.log('Error')
+                },
+            });
+            setitem('')
         }
     }
+
+
+
 
     const showEditModel = (record) => {
         setselectedItem(record)

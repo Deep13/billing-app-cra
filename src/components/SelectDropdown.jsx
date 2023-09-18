@@ -5,7 +5,7 @@ const SelectDropdown = ({ className, data = [], onChange, disabled = false}) => 
     <select disabled={disabled} onChange={onChange} className={className}>
       {
         data.map((curr, index) => {
-          return <option key={curr.text + index} value={curr.text}>{curr.text}</option>
+          return <option key={curr.item + index} value={curr.item}>{curr.item}</option>
         })
       }
     </select>
