@@ -6,6 +6,7 @@ import FeatherIcon from "feather-icons-react";
 // import Data from "../assets/jsons/productList";
 import "../../components/antd.css";
 import { Table } from "antd";
+import * as bootstrap from 'bootstrap'
 // import Select2 from '../components/SelectDropdown'
 
 // import {
@@ -109,16 +110,35 @@ const OrnamentType = () => {
     ];
 
 
-    const handleAddItem = () => {
+   const handleAddItem = () => {
         if (selectedItem) {
-            var editValue = datasource.filter(val => {
-                if (val.id === selectedItem.id) {
-                    val.item = item
-                }
-                return val
+
+            $.ajax({
+                url: 'http://localhost:80/billing_api/index.php',
+                type: "POST",
+                data: {
+                    method: "updateOrnamentType",
+                    data: JSON.stringify({ id: parseInt(selectedItem.id), item: item }),
+                },
+                success: function (dataClient) {
+                    var editValue = datasource.filter(val => {
+                        if (val.id === selectedItem.id) {
+                            val.item = item
+                        }
+                        return val
+                    });
+
+                    setdatasource([...editValue]);
+                    console.log(dataClient);
+                    setitem('');
+                    setselectedItem(null)
+                },
+                error: function (request, error) {
+                    console.log('Error')
+                },
             });
 
-            setdatasource([...editValue]);
+
         }
         else {
             // var lastIndex = datasource.length;
@@ -153,8 +173,23 @@ const OrnamentType = () => {
     }
 
     const deleteItem = (record) => {
-        var items = datasource.filter(val => val.id !== record.id);
-        setdatasource([...items])
+        $.ajax({
+            url: 'http://localhost:80/billing_api/index.php',
+            type: "POST",
+            data: {
+                method: "deleteOrnamentType",
+                data: JSON.stringify({ id: record.id }),
+            },
+            success: function (dataClient) {
+                setitem('')
+                var items = datasource.filter(val => val.id !== record.id);
+                setdatasource([...items])
+            },
+            error: function (request, error) {
+                console.log('Error')
+            },
+        });
+
     }
 
     return (

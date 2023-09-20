@@ -23,18 +23,18 @@ const StockManagement = () => {
   const [ornamentType, setOrnamentType] = useState([])
 
 
-  const [data, setData] = useState([{
-    Id: '1',
-    EntryDate: new Date().toLocaleDateString(),
-    OmDesc: 'GOLD',
-    OmCode: '1234',
-    Purity: '22K',
-    grosswt: '23.8',
-    netwt: '23.5',
-    stonewt: '12',
+  const [data, setData] = useState([])
+  const [currentItem, setCurrentItem] = useState({
+    orm_desc: 'GOLD',
+    om_code: 'curritem1235',
+    purity: '22K',
+    gross_wt: '23.8',
+    net_wt: '23.5',
+    stone_wt: '12',
     qty: '20',
-    huid: '1234',
-  }])
+    huid: 'curr1245',
+    action: ""
+  })
   const [menu, setMenu] = useState(false);
   const [show, setShow] = useState(false);
   const [purity, setPurity] = useState();
@@ -48,6 +48,7 @@ const StockManagement = () => {
 
   const handlePurityChange = (e) => {
     setPurity(e.target.value)
+    setCurrentItem({ ...currentItem, purity: e.target.value })
   }
 
   const toggleMobileMenu = () => {
@@ -56,71 +57,69 @@ const StockManagement = () => {
 
 
   const handleAddItem = () => {
-    let newItem = {
-      Id: '1',
-      EntryDate: new Date().toLocaleDateString(),
-      OmDesc: 'GOLD',
-      OmCode: '1234',
-      Purity: '22K',
-      grosswt: '23.8',
-      netwt: '23.5',
-      stonewt: '12',
-      qty: '20',
-      huid: '1234',
-    }
-    setData(prev => [newItem, ...prev])
-
+    // let newItem = {
+    //   om_desc: 'GOLD',
+    //   om_code: '1234',
+    //   purity: '22K',
+    //   gross_wt: '23.8',
+    //   net_wt: '23.5',
+    //   stone_wt: '12',
+    //   qty: '20',
+    //   huid: '1234',
+    // }
+    // setData(prev => [newItem, ...prev])
+    InsertStockToDb(currentItem)
   }
 
-  const [units, setUnits] = useState([
-    { id: 1, text: "22-08-2023" },
-    { id: 2, text: "15-09-2023" },
-    { id: 3, text: "16-07-2023" },
-    { id: 4, text: "21-08-2023" },
-    { id: 5, text: "2-11-2023" },
-  ]);
+  // const [units, setUnits] = useState([
+  //   { id: 1, text: "22-08-2023" },
+  //   { id: 2, text: "15-09-2023" },
+  //   { id: 3, text: "16-07-2023" },
+  //   { id: 4, text: "21-08-2023" },
+  //   { id: 5, text: "2-11-2023" },
+  // ]);
 
 
   const columns = [
     {
       title: "#",
-      dataIndex: "Id",
+      dataIndex: "id",
       sorter: (a, b) => a.Id.length - b.Id.length,
     },
     {
       title: "Entry Date",
-      dataIndex: "EntryDate",
+      dataIndex: "entry_date",
       sorter: (a, b) => a.EntryDate.length - b.EntryDate.length,
     },
     {
       title: "Ornament Desc",
-      dataIndex: "OmDesc",
+      dataIndex: "orm_desc",
       sorter: (a, b) => a.OmDesc.length - b.OmDesc.length,
     },
     {
       title: "OmCode",
-      dataIndex: "OmCode",
+      dataIndex: "om_code",
       sorter: (a, b) => a.OmCode.length - b.OmCode.length,
     },
 
     {
       title: "Purity",
-      dataIndex: "Purity",
+      dataIndex: "purity",
       sorter: (a, b) => a.Purity.length - b.Purity.length,
     },
     {
       title: "Gross Wt",
-      dataIndex: "grosswt",
+      dataIndex: "gross_wt",
       sorter: (a, b) => a.grosswt.length - b.grosswt.length,
     },
     {
       title: "Net Wt",
-      dataIndex: "netwt",
+      dataIndex: "net_wt",
       sorter: (a, b) => a.netwt.length - b.netwt.length,
     },
     {
       title: "Stone Wt",
-      dataIndex: "stonewt",
+      dataIndex: "stone_wt",
       sorter: (a, b) => a.stonewt.length - b.stonewt.length,
     },
     {
@@ -135,9 +134,16 @@ const StockManagement = () => {
     },
     {
       title: "Action",
-      dataIndex: "Action",
+      dataIndex: "action",
       render: (text, record) => (
-        <div className="d-flex align-items-center">
+        <div className="d-flex align-items-center gap-1">
+          <div
+            data-bs-toggle="modal"
+            data-bs-target="#edit_inventory"
+            onClick={() => showEditModel(record)}
+            className="btn btn-primary">
+            edit
+          </div>
           {/* <Link
                         to="#"
                         className="btn btn-greys bg-success-light me-2"
@@ -154,16 +160,21 @@ const StockManagement = () => {
                     >
                         <i className="fa fa-plus-circle me-1" /> Stock out
                     </Link> */}
-          <div className="dropdown dropdown-action">
-            <Link
+          <div
+            onClick={() => {
+              deleteStock(record)
+            }}
+            className="btn btn-danger">
+            delete
+            {/* <Link
               to="#"
               className=" btn-action-icon "
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
               <i className="fas fa-ellipsis-v" />
-            </Link>
-            <div className="dropdown-menu dropdown-menu-right">
+            </Link> */}
+            {/* <div className="dropdown-menu dropdown-menu-right">
               <ul>
                 <li>
                   <Link
@@ -178,7 +189,7 @@ const StockManagement = () => {
                 </li>
                 <li>
                   <Link
-                    className="dropdown-item"
+                    className="dropdown-item btn"
                     to="#"
                     data-bs-toggle="modal"
                     data-bs-target="#delete_stock"
@@ -188,8 +199,9 @@ const StockManagement = () => {
                   </Link>
                 </li>
               </ul>
-            </div>
+            </div> */}
           </div>
+
         </div>
       ),
       sorter: (a, b) => a.Action.length - b.Action.length,
@@ -197,6 +209,51 @@ const StockManagement = () => {
   ];
 
 
+  const InsertStockToDb = (stockItem) => {
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "insertStock",
+        data: JSON.stringify({ ...stockItem }),
+      },
+      success: function (dataClient) {
+        console.log(dataClient);
+        refreshData();
+      },
+      error: function (request, error) {
+        console.log('Error')
+      },
+    });
+  }
+
+  const deleteStock = (record) => {
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "deleteStock",
+        data: JSON.stringify({ id: record.id }),
+      },
+      success: function (dataClient) {
+        // setitem('')
+        console.log(JSON.parse(dataClient))
+        refreshData();
+      },
+      error: function (request, error) {
+        console.log('Error')
+      },
+    });
+
+  }
+
+  const showEditModel = (record) => {
+    // setselectedItem(record)
+    setCurrentItem(record)
+    console.log(record)
+    // var myModal = new bootstrap.Modal(document.getElementById('edit_inventory'));
+    // myModal.show()
+  }
 
   // const ItemRef = useRef()
   // const DateRef = useRef()
@@ -214,6 +271,11 @@ const StockManagement = () => {
     refreshData();
   }, [])
 
+  useEffect(() => {
+    // refreshData();
+    console.log(currentItem)
+  }, [currentItem])
+
   const refreshData = () => {
     $.ajax({
       url: 'http://localhost:80/billing_api/index.php',
@@ -225,13 +287,13 @@ const StockManagement = () => {
         try {
           // setdatasource(JSON.parse(dataClient))
           setPurityData(JSON.parse(dataClient))
-          console.log(JSON.parse(dataClient))
+          // console.log(JSON.parse(dataClient))
         } catch (e) {
           // setdatasource([])
           setPurity([])
           console.log(e)
         }
-        console.log(dataClient);
+        // console.log(dataClient);
       },
       error: function (request, error) {
         console.log('Error')
@@ -249,13 +311,36 @@ const StockManagement = () => {
         try {
           // setdatasource(JSON.parse(dataClient))
           setOrnamentType(JSON.parse(dataClient))
+          // console.log(JSON.parse(dataClient))
+        } catch (e) {
+          // setdatasource([])
+          setOrnamentType([])
+          console.log(e)
+        }
+        // console.log(dataClient);
+      },
+      error: function (request, error) {
+        console.log('Error')
+      },
+    });
+
+    // getting stock data
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "getStocks",
+      },
+      success: function (dataClient) {
+        try {
+          setData(JSON.parse(dataClient))
           console.log(JSON.parse(dataClient))
         } catch (e) {
           // setdatasource([])
           setOrnamentType([])
           console.log(e)
         }
-        console.log(dataClient);
+        // console.log(dataClient);
       },
       error: function (request, error) {
         console.log('Error')
@@ -319,6 +404,16 @@ const StockManagement = () => {
                     <li>
                       <Link
                         to="#"
+                        onClick={() => setCurrentItem({
+                          orm_desc: '',
+                          om_code: '',
+                          purity: '',
+                          gross_wt: '',
+                          net_wt: '',
+                          stone_wt: '',
+                          qty: '',
+                          huid: '',
+                        })}
                         data-bs-toggle="modal"
                         data-bs-target="#edit_inventory"
                         className="btn btn-rounded btn-primary me-1 flex items-center">
@@ -390,6 +485,8 @@ const StockManagement = () => {
                     <div className="form-group mb-0">
                       <label>Ornament Desc</label>
                       <Select2
+                        value={currentItem.orm_desc}
+                        onChange={(e) => setCurrentItem({ ...currentItem, orm_desc: e.target.value })}
                         type="text"
                         data={ornamentType}
                         className="form-control"
@@ -401,6 +498,8 @@ const StockManagement = () => {
                     <div className="form-group">
                       <label>Om Code</label>
                       <input
+                        value={currentItem.om_code}
+                        onChange={(e) => setCurrentItem({ ...currentItem, om_code: e.target.value })}
                         type="text"
                         className="form-control"
                       />
@@ -411,6 +510,7 @@ const StockManagement = () => {
                     <div className="form-group mb-0">
                       <label>Purity</label>
                       <Select2
+
                         onChange={handlePurityChange}
                         className="form-control"
                         data={purityData}
@@ -423,6 +523,8 @@ const StockManagement = () => {
                     <div className="form-group">
                       <label>Gross Wt</label>
                       <input
+                        value={currentItem.gross_wt}
+                        onChange={(e) => setCurrentItem({ ...currentItem, gross_wt: e.target.value })}
                         type="text"
                         className="form-control"
                       />
@@ -433,6 +535,8 @@ const StockManagement = () => {
                     <div className="form-group">
                       <label>Net Wt</label>
                       <input
+                        value={currentItem.net_wt}
+                        onChange={(e) => setCurrentItem({ ...currentItem, net_wt: e.target.value })}
                         type="text"
                         className="form-control"
                       />
@@ -443,6 +547,8 @@ const StockManagement = () => {
                     <div className="form-group">
                       <label>Stone Wt</label>
                       <input
+                        value={currentItem.stone_wt}
+                        onChange={(e) => setCurrentItem({ ...currentItem, stone_wt: e.target.value })}
                         type="text"
                         className="form-control"
                       />
@@ -454,6 +560,8 @@ const StockManagement = () => {
                     <div className="form-group mb-0">
                       <label>Quantity</label>
                       <input
+                        value={currentItem.qty}
+                        onChange={(e) => setCurrentItem({ ...currentItem, qty: e.target.value })}
                         type="text"
                         className="form-control"
                       />
@@ -465,6 +573,8 @@ const StockManagement = () => {
                     <div className="form-group">
                       <label>HUID</label>
                       <input
+                        value={currentItem.huid}
+                        onChange={(e) => setCurrentItem({ ...currentItem, huid: e.target.value })}
                         type="text"
                         className="form-control"
                       />

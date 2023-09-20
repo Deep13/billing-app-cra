@@ -6,14 +6,15 @@ import FeatherIcon from "feather-icons-react";
 // import Data from "../assets/jsons/productList";
 import "../components/antd.css";
 import { Table } from "antd";
-import Select2 from '../components/SelectDropdown'
+// import Select2 from '../components/SelectDropdown'
+import * as bootstrap from 'bootstrap'
 
 // import {
 //     onShowSizeChange,
 //     itemRender,
 // } from "../components/paginationfunction";
-import AddVendor from "../vendors/addVendor";
-import { FilterChart, search } from "../components/imagepath";
+// import AddVendor from "../vendors/addVendor";
+// import { FilterChart, search } from "../components/imagepath";
 
 const MasterData = () => {
     const [menu, setMenu] = useState(false);
@@ -106,14 +107,33 @@ const MasterData = () => {
 
     const handleAddItem = () => {
         if (selectedItem) {
-            var editValue = datasource.filter(val => {
-                if (val.id === selectedItem.id) {
-                    val.item = item
-                }
-                return val
+
+            $.ajax({
+                url: 'http://localhost:80/billing_api/index.php',
+                type: "POST",
+                data: {
+                    method: "updateOrnament",
+                    data: JSON.stringify({ id: parseInt(selectedItem.id), item: item }),
+                },
+                success: function (dataClient) {
+                    var editValue = datasource.filter(val => {
+                        if (val.id === selectedItem.id) {
+                            val.item = item
+                        }
+                        return val
+                    });
+
+                    setdatasource([...editValue]);
+                    console.log(dataClient);
+                    setitem('');
+                    setselectedItem(null)
+                },
+                error: function (request, error) {
+                    console.log('Error')
+                },
             });
 
-            setdatasource([...editValue]);
+
         }
         else {
             // var lastIndex = datasource.length;
@@ -139,6 +159,26 @@ const MasterData = () => {
 
 
 
+    const deleteItem = (record) => {
+        $.ajax({
+            url: 'http://localhost:80/billing_api/index.php',
+            type: "POST",
+            data: {
+                method: "deleteOrnament",
+                data: JSON.stringify({ id: record.id }),
+            },
+            success: function (dataClient) {
+                setitem('')
+                var items = datasource.filter(val => val.id !== record.id);
+                setdatasource([...items])
+            },
+            error: function (request, error) {
+                console.log('Error')
+            },
+        });
+
+    }
+
 
     const showEditModel = (record) => {
         setselectedItem(record)
@@ -147,10 +187,10 @@ const MasterData = () => {
         myModal.show()
     }
 
-    const deleteItem = (record) => {
-        var items = datasource.filter(val => val.id !== record.id);
-        setdatasource([...items])
-    }
+    // const deleteItem = (record) => {
+    //     var items = datasource.filter(val => val.id !== record.id);
+    //     setdatasource([...items])
+    // }
 
     return (
         <>

@@ -1,8 +1,8 @@
 import React from 'react'
 
-const SelectDropdown = ({ className, data = [], onChange, disabled = false}) => {
+const SelectDropdown = ({ className, data = [], onChange, disabled = false, value}) => {
   return (
-    <select disabled={disabled} onChange={onChange} className={className}>
+    <select value={value} disabled={disabled} onChange={onChange} className={className}>
       {
         data.map((curr, index) => {
           return <option key={curr.item + index} value={curr.item}>{curr.item}</option>
