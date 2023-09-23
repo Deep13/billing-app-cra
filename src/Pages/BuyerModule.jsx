@@ -65,6 +65,10 @@ const BuyerModule = () => {
 
   const [addProduct, setAddProduct] = useState(false)
   const [disable, setDisable] = useState(false)
+  const [purityChoices, setPurityChoices] = useState([])
+  const [idChoices, setIdChoices] = useState([])
+  const [gstEntries, setGstEntries] = useState([])
+  const [ornamentTypes, setOrnamentTypes] = useState([])
 
   const [product, setProduct] = useState([
     { id: 1, text: "Choose Customer" },
@@ -73,48 +77,48 @@ const BuyerModule = () => {
     { id: 4, text: "Customer 3" },
   ]);
 
-  const [state, setState] = useState([
-    { text: 'Andhra Pradesh' },
-    { text: 'Arunachal Pradesh' },
-    { text: 'Assam' },
-    { text: 'Bihar' },
-    { text: 'Chhattisgarh' },
-    { text: 'Goa' },
-    { text: 'Gujarat' },
-    { text: 'Haryana' },
-    { text: 'Himachal Pradesh' },
-    { text: 'Jharkhand' },
-    { text: 'Karnataka' },
-    { text: 'Kerala' },
-    { text: 'Madhya Pradesh' },
-    { text: 'Maharashtra' },
-    { text: 'Manipur' },
-    { text: 'Meghalaya' },
-    { text: 'Mizoram' },
-    { text: 'Nagaland' },
-    { text: 'Odisha' },
-    { text: 'Punjab' },
-    { text: 'Rajasthan' },
-    { text: 'Sikkim' },
-    { text: 'Tamil Nadu' },
-    { text: 'Telangana' },
-    { text: 'Tripura' },
-    { text: 'Uttar Pradesh' },
-    { text: 'Uttarakhand' },
-    { text: 'West Bengal' }
-  ])
+  const state = [
+    { item: 'Andhra Pradesh' },
+    { item: 'Arunachal Pradesh' },
+    { item: 'Assam' },
+    { item: 'Bihar' },
+    { item: 'Chhattisgarh' },
+    { item: 'Goa' },
+    { item: 'Gujarat' },
+    { item: 'Haryana' },
+    { item: 'Himachal Pradesh' },
+    { item: 'Jharkhand' },
+    { item: 'Karnataka' },
+    { item: 'Kerala' },
+    { item: 'Madhya Pradesh' },
+    { item: 'Maharashtra' },
+    { item: 'Manipur' },
+    { item: 'Meghalaya' },
+    { item: 'Mizoram' },
+    { item: 'Nagaland' },
+    { item: 'Odisha' },
+    { item: 'Punjab' },
+    { item: 'Rajasthan' },
+    { item: 'Sikkim' },
+    { item: 'Tamil Nadu' },
+    { item: 'Telangana' },
+    { item: 'Tripura' },
+    { item: 'Uttar Pradesh' },
+    { item: 'Uttarakhand' },
+    { item: 'West Bengal' }
+  ]
 
   const [jewelleryType, setJewelleryType] = useState([
-    { text: "Diamond Necklace" },
-    { text: "Gold Bracelet" },
-    { text: "Pearl Earrings" },
-    { text: "Silver Ring" },
-    { text: "Sapphire Pendant" },
-    { text: "Emerald Brooch" },
-    { text: "Ruby Anklet" },
-    { text: "Amethyst Tiara" },
-    { text: "Opal Cufflinks" },
-    { text: "Platinum Watch" },
+    { item: "Diamond Necklace" },
+    { item: "Gold Bracelet" },
+    { item: "Pearl Earrings" },
+    { item: "Silver Ring" },
+    { item: "Sapphire Pendant" },
+    { item: "Emerald Brooch" },
+    { item: "Ruby Anklet" },
+    { item: "Amethyst Tiara" },
+    { item: "Opal Cufflinks" },
+    { item: "Platinum Watch" },
   ])
 
   const [editValues, setEditValues] = useState({
@@ -203,7 +207,7 @@ const BuyerModule = () => {
   }
 
   const handleTypeChange = (e) => {
-    setTypeOption(e.target.value)
+    // setTypeOption(e.target.value)
   }
 
   const handleOnEnterAnyTableData = () => {
@@ -259,7 +263,77 @@ const BuyerModule = () => {
     // reset values remember
   }
 
+  const refreshData = () => {
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "getPurity",
+      },
+      success: function (dataClient) {
+        console.log(JSON.parse(dataClient));
+        setPurityChoices(JSON.parse(dataClient))
+      },
+      error: function (request, error) {
+        console.log('Error')
+      }
+    });
+
+
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "getOrnamentType",
+      },
+      success: function (dataClient) {
+        try {
+          console.log((dataClient));
+          setOrnamentTypes(JSON.parse(dataClient))
+        } catch (e) {
+          setOrnamentTypes([])
+          console.log(e)
+        }
+      },
+      error: function (request, error) {
+        console.log('Error')
+      }
+    });
+
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "getIdentificationType",
+      },
+      success: function (dataClient) {
+        console.log(JSON.parse(dataClient));
+        setIdChoices(JSON.parse(dataClient))
+      },
+      error: function (request, error) {
+        console.log('Error')
+      }
+    });
+
+
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "getGstEntry",
+      },
+      success: function (dataClient) {
+        console.log(JSON.parse(dataClient));
+        setGstEntries(JSON.parse(dataClient))
+      },
+      error: function (request, error) {
+        console.log('Error')
+      }
+    });
+  }
+
   useEffect(() => {
+    refreshData()
     let elements = Array.from(
       document.getElementsByClassName("react-datepicker-wrapper")
     );
@@ -442,10 +516,10 @@ const BuyerModule = () => {
                             <label>ID Type</label>
                             <br />
                             <Select2
-                              disabled={disable}
+                              // disabled={disable}
                               onChange={handleCardType}
                               className='form-control relative'
-                              data={idType}
+                              data={idChoices}
                             />
                           </div>
                           <div className="form-group">
@@ -509,7 +583,7 @@ const BuyerModule = () => {
                           <Select2
                             onChange={handleTypeChange}
                             className="form-control w-100"
-                            data={jewelleryType}
+                            data={ornamentTypes}
                           />
                         </div>
                       </div>
@@ -519,7 +593,7 @@ const BuyerModule = () => {
                           <Select2
                             onChange={handleTypeChange}
                             className="form-control w-100"
-                            data={jewelleryType}
+                            data={purityChoices}
                           />
                         </div>
                       </div>
@@ -737,10 +811,10 @@ const BuyerModule = () => {
                             <div className="invoice-total-box">
                               <div className="invoice-total-inner">
                                 <p>
-                                  CGST <span>₹120.00</span>
+                                  CGST({gstEntries[0]?.item}) <span>₹120.00</span>
                                 </p>
                                 <p>
-                                  SGST <span>₹120.00</span>
+                                  SGST({gstEntries[1]?.item}) <span>₹120.00</span>
                                 </p>
                                 <p>
                                   Discount <span>₹13.20</span>
@@ -870,7 +944,7 @@ const BuyerModule = () => {
                       <Select2
                         onChange={handleTypeChange}
                         className="form-control w-100"
-                        data={jewelleryType}
+                        data={purityChoices}
                       />
                     </div>
                   </div>

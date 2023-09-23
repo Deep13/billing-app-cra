@@ -19,6 +19,7 @@ const GSTEntry = () => {
     const [menu, setMenu] = useState(false);
     const [item, setitem] = useState(null);
     const [selectedItem, setselectedItem] = useState(null);
+    const [editMode, setEditMode] = useState(false)
     const [toBeDeleteItem, setToBeDeleteItem] = useState(null);
     // const [show, setShow] = useState(false);
     // const [confirmDelete, setConfirmDelete] = useState(false)
@@ -64,6 +65,11 @@ const GSTEntry = () => {
         {
             title: "Item",
             dataIndex: "item",
+            sorter: (a, b) => a.item.length - b.item.length,
+        },
+        {
+            title: "Value",
+            dataIndex: "value",
             sorter: (a, b) => a.item.length - b.item.length,
         },
         {
@@ -165,8 +171,9 @@ const GSTEntry = () => {
 
 
     const showEditModel = (record) => {
+        setEditMode(true)
         setselectedItem(record)
-        setitem(record.desc)
+        setitem(record.item)
         var myModal = new bootstrap.Modal(document.getElementById('edit_inventory'));
         myModal.show()
     }
@@ -208,6 +215,11 @@ const GSTEntry = () => {
                                         <li>
                                             <button
                                                 data-bs-toggle="modal"
+                                                onClick={() => {
+                                                    setitem('')
+                                                    setselectedItem(null)
+                                                    setEditMode(false)
+                                                }}
                                                 data-bs-target="#edit_inventory"
                                                 // onClick={AddItemToTable}
                                                 className="btn btn-primary flex items-center gap-2">
@@ -305,7 +317,7 @@ const GSTEntry = () => {
                         <div className="modal-content">
                             <div className="modal-header border-0 pb-0">
                                 <div className="form-header modal-header-title text-start mb-0">
-                                    <h4 className="mb-0">Add Items</h4>
+                                    <h4 className="mb-0">{editMode ? 'Update' : 'Add Items'}</h4>
                                 </div>
                                 <button
                                     type="button"
@@ -329,8 +341,8 @@ const GSTEntry = () => {
                                                 className="form-control"
                                                 style={{ width: '100%' }}
                                                 value={item}
-                                                onChange={(text) => {
-                                                    setitem(text.target.value)
+                                                onChange={(e) => {
+                                                    setitem(e.target.value)
                                                 }}
                                             // defaultValue="Stock in"
                                             />
@@ -353,7 +365,7 @@ const GSTEntry = () => {
                                     className="btn btn-primary paid-continue-btn"
                                     onClick={handleAddItem}
                                 >
-                                    Add
+                                    {editMode ? 'Update' : 'Add'}
                                 </Link>
                             </div>
                         </div>

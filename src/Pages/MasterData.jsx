@@ -41,7 +41,7 @@ const MasterData = () => {
             },
             error: function (request, error) {
                 console.log('Error')
-            },
+            }
         });
     }
 
@@ -153,8 +153,8 @@ const MasterData = () => {
                     console.log('Error')
                 },
             });
-            setitem('')
         }
+        setitem('')
     }
 
 

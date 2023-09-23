@@ -37,6 +37,7 @@ const StockManagement = () => {
   })
   const [menu, setMenu] = useState(false);
   const [show, setShow] = useState(false);
+  const [editMode, setEditMode] = useState(false)
   const [purity, setPurity] = useState();
   const purityType = [
     { text: 18 },
@@ -68,8 +69,66 @@ const StockManagement = () => {
     //   huid: '1234',
     // }
     // setData(prev => [newItem, ...prev])
-    InsertStockToDb(currentItem)
+    if (editMode && currentItem) {
+      updateStockToDb(currentItem)
+    }
+    else {
+      InsertStockToDb(currentItem)
+    }
+    setEditMode(false)
   }
+
+  // const handleAddItem = () => {
+  //   if (selectedItem) {
+
+  //     $.ajax({
+  //       url: 'http://localhost:80/billing_api/index.php',
+  //       type: "POST",
+  //       data: {
+  //         method: "updateOrnament",
+  //         data: JSON.stringify({ id: parseInt(selectedItem.id), item: item }),
+  //       },
+  //       success: function (dataClient) {
+  //         var editValue = datasource.filter(val => {
+  //           if (val.id === selectedItem.id) {
+  //             val.item = item
+  //           }
+  //           return val
+  //         });
+
+  //         setdatasource([...editValue]);
+  //         console.log(dataClient);
+  //         setitem('');
+  //         setselectedItem(null)
+  //       },
+  //       error: function (request, error) {
+  //         console.log('Error')
+  //       },
+  //     });
+
+
+  //   }
+  //   else {
+  //     // var lastIndex = datasource.length;
+  //     // setdatasource([...datasource, { Id: lastIndex, Item: item }])
+  //     $.ajax({
+  //       url: 'http://localhost:80/billing_api/index.php',
+  //       type: "POST",
+  //       data: {
+  //         method: "insertOrnament",
+  //         data: JSON.stringify({ item: item }),
+  //       },
+  //       success: function (dataClient) {
+  //         console.log(dataClient);
+  //         refreshData();
+  //       },
+  //       error: function (request, error) {
+  //         console.log('Error')
+  //       },
+  //     });
+  //     setitem('')
+  //   }
+  // }
 
   // const [units, setUnits] = useState([
   //   { id: 1, text: "22-08-2023" },
@@ -140,7 +199,7 @@ const StockManagement = () => {
           <div
             data-bs-toggle="modal"
             data-bs-target="#edit_inventory"
-            onClick={() => showEditModel(record)}
+            onClick={() => { showEditModel(record) }}
             className="btn btn-primary">
             edit
           </div>
@@ -227,6 +286,39 @@ const StockManagement = () => {
     });
   }
 
+  const updateStockToDb = (stockItem) => {
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: 'POST',
+      data: {
+        method: 'updateStock', // Updated method name to match your PHP function
+        data: JSON.stringify({ ...stockItem }),
+      },
+      success: function (dataClient) {
+        // Check the response dataClient to see if the update was successful
+        // var response = JSON.parse(dataClient);
+        // if (response[0] === 'Update successful') {
+        // var editValue = data.map(val => {
+        //   if (val.id === currentItem.id) {
+        //     val.item = item;
+        //   }
+        //   return val;
+        // });
+        //   console.log('Update successful:', response[0]);
+        //   setCurrentItem(null);
+        // } else {
+        //   console.log('Update failed:', response[0]);
+        // }
+        console.log(dataClient);
+        refreshData();
+      },
+      error: function (request, error) {
+        console.log('Error:', error);
+      },
+    });
+
+  }
+
   const deleteStock = (record) => {
     $.ajax({
       url: 'http://localhost:80/billing_api/index.php',
@@ -250,6 +342,7 @@ const StockManagement = () => {
   const showEditModel = (record) => {
     // setselectedItem(record)
     setCurrentItem(record)
+    setEditMode(true)
     console.log(record)
     // var myModal = new bootstrap.Modal(document.getElementById('edit_inventory'));
     // myModal.show()
@@ -404,16 +497,19 @@ const StockManagement = () => {
                     <li>
                       <Link
                         to="#"
-                        onClick={() => setCurrentItem({
-                          orm_desc: '',
-                          om_code: '',
-                          purity: '',
-                          gross_wt: '',
-                          net_wt: '',
-                          stone_wt: '',
-                          qty: '',
-                          huid: '',
-                        })}
+                        onClick={() => {
+                          setCurrentItem({
+                            orm_desc: '',
+                            om_code: '',
+                            purity: '',
+                            gross_wt: '',
+                            net_wt: '',
+                            stone_wt: '',
+                            qty: '',
+                            huid: '',
+                          })
+                          setEditMode(false)
+                        }}
                         data-bs-toggle="modal"
                         data-bs-target="#edit_inventory"
                         className="btn btn-rounded btn-primary me-1 flex items-center">
@@ -456,7 +552,7 @@ const StockManagement = () => {
             <div className="modal-content">
               <div className="modal-header border-0 pb-0">
                 <div className="form-header modal-header-title text-start mb-0">
-                  <h4 className="mb-0">Add Items</h4>
+                  <h4 className="mb-0">{editMode ? 'Edit Item' : 'Add Items'}</h4>
                 </div>
                 <button
                   type="button"
@@ -471,7 +567,7 @@ const StockManagement = () => {
               </div>
               <div className="modal-body">
                 <div className="row">
-                  <div className="col-lg-6 col-md-12">
+                  {/* <div className="col-lg-6 col-md-12">
                     <div className="form-group">
                       <label>Entry Date</label>
                       <input
@@ -479,7 +575,7 @@ const StockManagement = () => {
                         className="form-control"
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="col-lg-6 col-md-12">
                     <div className="form-group mb-0">
@@ -599,7 +695,7 @@ const StockManagement = () => {
                   className="btn btn-primary paid-continue-btn"
                   onClick={handleAddItem}
                 >
-                  Add
+                  {editMode ? 'Update' : 'Add'}
                 </Link>
               </div>
             </div>
@@ -624,6 +720,7 @@ const StockManagement = () => {
                     <div className="col-6">
                       <Link
                         to="#"
+                        onClick={() => setEditMode(false)}
                         data-bs-dismiss="modal"
                         className="btn btn-primary paid-cancel-btn"
                       >

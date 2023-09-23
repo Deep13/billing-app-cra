@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import Home from './components/Home'
+// import Home from './components/Home'
 import StockManagement from './Pages/StockManagement'
-import { BuyerModule, DailyExpenses, DueManagement, ExpenseManagement, InvoiceManagement, Login, MasterData, PurchaseModule } from './Pages'
+import { BuyerModule, Customers, DailyExpenses, InvoiceList, DueManagement, ExpenseManagement, InvoiceManagement, Login, MasterData, PurchaseModule } from './Pages'
 import InvoiceGeneration from './Pages/Orders'
 import Ornament from './Pages/MasterDataPages/Ornament'
 import OrnamentType from './Pages/MasterDataPages/OrnamentType'
@@ -38,6 +38,8 @@ function App() {
           <Route index element={<MasterData />} />
           <Route index={false} path='ornament-type' element={<OrnamentType />} />
           <Route path='gst-entry' element={<GSTEntry />} />
+          <Route path='customers' element={<Customers />} />
+          <Route path='invoices-list' element={<InvoiceList />} />
           <Route path='invoice' element={<InvoiceFormat />} />
           <Route path='hm-charge' element={<HMCharge />} />
           <Route path='hsn-code' element={<HSNCode />} />
