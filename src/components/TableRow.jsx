@@ -12,12 +12,44 @@ const TableRow = ({
     net,
     amount,
     making_charges,
-    handleOnEnterAnyData
+    handleOnEnterAnyData,
+    // getStockData,
 }) => {
+
+
+    const getStockData = (huid) => {
+        debugger;
+        $.ajax({
+            url: 'http://localhost:80/billing_api/index.php',
+            type: "POST",
+            data: {
+                method: "getStockByHuid",
+                data: JSON.stringify({ huid: huid }),
+            },
+            success: function (dataClient) {
+                try {
+                    console.log(JSON.parse(dataClient));
+                } catch (e) {
+                    console.log(e)
+                }
+                // setPurityChoices(JSON.parse(dataClient))
+            },
+            error: function (request, error) {
+                console.log('Error')
+            }
+        });
+    }
+
+
+
     return (
         <>
             <td>
-                <input className='form-control text-sm' placeholder={product} onChange={handleOnEnterAnyData} type="text" />
+                <input onKeyUp={(e) => {
+                    if (e.key === 'Enter') {
+                        getStockData('10024')
+                    }
+                }} className='form-control text-sm' placeholder={product} onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
                 <input className='form-control p-2' placeholder={desc} onChange={handleOnEnterAnyData} type="text" />

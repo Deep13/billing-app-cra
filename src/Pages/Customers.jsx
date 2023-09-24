@@ -226,7 +226,7 @@ const Customers = () => {
         console.log(record)
     }
 
-  
+
 
 
 
@@ -241,7 +241,7 @@ const Customers = () => {
 
     const refreshData = () => {
         $.ajax({
-            url: 'http://localhost:80/billing_api/customers.php',
+            url: 'http://localhost:80/billing_api/index.php',
             type: "POST",
             data: {
                 method: "getCustomers",

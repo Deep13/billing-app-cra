@@ -84,7 +84,7 @@ const GSTEntry = () => {
                             className="btn btn-primary gap-2">
                             Edit
                         </button>
-                        {
+                        {/* {
                             (record.item === toBeDeleteItem) ?
                                 <>
                                     <button onClick={() => deleteItem(record)} className="btn btn-primary ms-1 me-2">confirm</button>
@@ -107,7 +107,7 @@ const GSTEntry = () => {
                                     className="btn btn-danger gap-2">
                                     Delete
                                 </button>
-                        }
+                        } */}
                     </div>
                 </>
             )
@@ -128,7 +128,7 @@ const GSTEntry = () => {
                 success: function (dataClient) {
                     var editValue = datasource.filter(val => {
                         if (val.id === selectedItem.id) {
-                            val.item = item
+                            val.value = item
                         }
                         return val
                     });
@@ -173,7 +173,7 @@ const GSTEntry = () => {
     const showEditModel = (record) => {
         setEditMode(true)
         setselectedItem(record)
-        setitem(record.item)
+        setitem(record.value)
         var myModal = new bootstrap.Modal(document.getElementById('edit_inventory'));
         myModal.show()
     }
@@ -213,7 +213,7 @@ const GSTEntry = () => {
                                     <ul className="filter-list">
 
                                         <li>
-                                            <button
+                                            {/* <button
                                                 data-bs-toggle="modal"
                                                 onClick={() => {
                                                     setitem('')
@@ -225,7 +225,7 @@ const GSTEntry = () => {
                                                 className="btn btn-primary flex items-center gap-2">
                                                 <FeatherIcon icon='plus' />
                                                 Add Product
-                                            </button>
+                                            </button> */}
                                         </li>
                                     </ul>
                                 </div>

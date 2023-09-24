@@ -202,6 +202,25 @@ const BuyerModule = () => {
   const [typeOption, setTypeOption] = useState()
   const [cardType, setCardType] = useState('card')
 
+  const getStockData = (huid) => {
+    debugger;
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "getStockByHuid",
+        data: JSON.stringify({ huid: huid }),
+      },
+      success: function (dataClient) {
+        console.log(JSON.parse(dataClient));
+        // setPurityChoices(JSON.parse(dataClient))
+      },
+      error: function (request, error) {
+        console.log('Error')
+      }
+    });
+  }
+
   const handleCardType = (e) => {
     setCardType(e.target.value)
   }
@@ -228,6 +247,7 @@ const BuyerModule = () => {
     //     }
     //   ])
     // }
+    getStockByHuid
   }
 
   const AddItemToTable = () => {
@@ -647,6 +667,7 @@ const BuyerModule = () => {
                                     <tbody key={curr.product + index}>
                                       <tr >
                                         <TableRow
+                                          getStockData={() => getStockData('10024')}
                                           product={curr.product}
                                           desc={curr.desc}
                                           pcs={curr.pcs}
@@ -811,10 +832,10 @@ const BuyerModule = () => {
                             <div className="invoice-total-box">
                               <div className="invoice-total-inner">
                                 <p>
-                                  CGST({gstEntries[0]?.item}) <span>₹120.00</span>
+                                  CGST({gstEntries[0]?.value}%) <span>₹120.00</span>
                                 </p>
                                 <p>
-                                  SGST({gstEntries[1]?.item}) <span>₹120.00</span>
+                                  SGST({gstEntries[1]?.value}%) <span>₹120.00</span>
                                 </p>
                                 <p>
                                   Discount <span>₹13.20</span>
