@@ -22,10 +22,40 @@ const Customers = () => {
     const [purityData, setPurityData] = useState([])
     const [ornamentType, setOrnamentType] = useState([])
 
+    const stateData = [
+        { item: 'Andhra Pradesh' },
+        { item: 'Arunachal Pradesh' },
+        { item: 'Assam' },
+        { item: 'Bihar' },
+        { item: 'Chhattisgarh' },
+        { item: 'Goa' },
+        { item: 'Gujarat' },
+        { item: 'Haryana' },
+        { item: 'Himachal Pradesh' },
+        { item: 'Jharkhand' },
+        { item: 'Karnataka' },
+        { item: 'Kerala' },
+        { item: 'Madhya Pradesh' },
+        { item: 'Maharashtra' },
+        { item: 'Manipur' },
+        { item: 'Meghalaya' },
+        { item: 'Mizoram' },
+        { item: 'Nagaland' },
+        { item: 'Odisha' },
+        { item: 'Punjab' },
+        { item: 'Rajasthan' },
+        { item: 'Sikkim' },
+        { item: 'Tamil Nadu' },
+        { item: 'Telangana' },
+        { item: 'Tripura' },
+        { item: 'Uttar Pradesh' },
+        { item: 'Uttarakhand' },
+        { item: 'West Bengal' }
+    ]
 
     const [data, setData] = useState([])
     const [currentItem, setCurrentItem] = useState({
-        contact_number: 9680859741,
+        contact_number: 96808,
         address: '22K',
         name: 'someone',
         id_type: 'PAAN',
@@ -37,6 +67,7 @@ const Customers = () => {
     const [menu, setMenu] = useState(false);
     const [show, setShow] = useState(false);
     const [editMode, setEditMode] = useState(false)
+    const [idTypes, setIdTypes] = useState([])
 
 
 
@@ -241,7 +272,7 @@ const Customers = () => {
 
     const refreshData = () => {
         $.ajax({
-            url: 'http://localhost:80/billing_api/index.php',
+            url: 'http://localhost:80/billing_api/customers.php',
             type: "POST",
             data: {
                 method: "getCustomers",
@@ -249,6 +280,22 @@ const Customers = () => {
             success: function (dataClient) {
                 console.log(JSON.parse(dataClient));
                 setData(JSON.parse(dataClient))
+            },
+            error: function (request, error) {
+                console.log('Error')
+            }
+        });
+
+        //getting id type
+        $.ajax({
+            url: 'http://localhost:80/billing_api/index.php',
+            type: "POST",
+            data: {
+                method: "getIdentificationType",
+            },
+            success: function (dataClient) {
+                console.log(JSON.parse(dataClient));
+                setIdTypes(JSON.parse(dataClient))
             },
             error: function (request, error) {
                 console.log('Error')
@@ -314,14 +361,14 @@ const Customers = () => {
                                                 to="#"
                                                 onClick={() => {
                                                     setCurrentItem({
-                                                        orm_desc: '',
-                                                        om_code: '',
-                                                        purity: '',
-                                                        gross_wt: '',
-                                                        net_wt: '',
-                                                        stone_wt: '',
-                                                        qty: '',
-                                                        huid: '',
+                                                        contact_number: '',
+                                                        address: '',
+                                                        name: '',
+                                                        id_type: '',
+                                                        id_value: '',
+                                                        gst_number: '',
+                                                        state: '',
+                                                        pincode: ''
                                                     })
                                                     setEditMode(false)
                                                 }}
@@ -392,7 +439,7 @@ const Customers = () => {
                     </div>
                   </div> */}
 
-                                    <div className="col-lg-6 col-md-12">
+                                    {/* <div className="col-lg-6 col-md-12">
                                         <div className="form-group mb-0">
                                             <label>Ornament Desc</label>
                                             <Select2
@@ -403,21 +450,34 @@ const Customers = () => {
                                                 className="form-control"
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     <div className="col-lg-6 col-md-12">
                                         <div className="form-group">
-                                            <label>Om Code</label>
+                                            <label>Contact Number</label>
                                             <input
-                                                value={currentItem.om_code}
-                                                onChange={(e) => setCurrentItem({ ...currentItem, om_code: e.target.value })}
+                                                value={currentItem.contact_number}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, contact_number: e.target.value })}
                                                 type="text"
                                                 className="form-control"
                                             />
                                         </div>
                                     </div>
 
+
                                     <div className="col-lg-6 col-md-12">
+                                        <div className="form-group">
+                                            <label>Address</label>
+                                            <input
+                                                value={currentItem.address}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, address: e.target.value })}
+                                                type="text"
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* <div className="col-lg-6 col-md-12">
                                         <div className="form-group mb-0">
                                             <label>Purity</label>
                                             <Select2
@@ -427,15 +487,15 @@ const Customers = () => {
                                                 data={purityData}
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
 
 
                                     <div className="col-lg-6 col-md-12">
                                         <div className="form-group">
-                                            <label>Gross Wt</label>
+                                            <label>Name</label>
                                             <input
-                                                value={currentItem.gross_wt}
-                                                onChange={(e) => setCurrentItem({ ...currentItem, gross_wt: e.target.value })}
+                                                value={currentItem.name}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, name: e.target.value })}
                                                 type="text"
                                                 className="form-control"
                                             />
@@ -444,22 +504,22 @@ const Customers = () => {
 
                                     <div className="col-lg-6 col-md-12">
                                         <div className="form-group">
-                                            <label>Net Wt</label>
-                                            <input
-                                                value={currentItem.net_wt}
-                                                onChange={(e) => setCurrentItem({ ...currentItem, net_wt: e.target.value })}
-                                                type="text"
+                                            <label>ID Type</label>
+                                            <Select2
+                                                value={currentItem.id_type}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, id_type: e.target.value })}
                                                 className="form-control"
+                                                data={idTypes}
                                             />
                                         </div>
                                     </div>
 
                                     <div className="col-lg-6 col-md-12">
                                         <div className="form-group">
-                                            <label>Stone Wt</label>
+                                            <label>ID Value</label>
                                             <input
-                                                value={currentItem.stone_wt}
-                                                onChange={(e) => setCurrentItem({ ...currentItem, stone_wt: e.target.value })}
+                                                value={currentItem.id_value}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, id_value: e.target.value })}
                                                 type="text"
                                                 className="form-control"
                                             />
@@ -469,10 +529,10 @@ const Customers = () => {
 
                                     <div className="col-lg-6 col-md-12">
                                         <div className="form-group mb-0">
-                                            <label>Quantity</label>
+                                            <label>GST Number</label>
                                             <input
-                                                value={currentItem.qty}
-                                                onChange={(e) => setCurrentItem({ ...currentItem, qty: e.target.value })}
+                                                value={currentItem.gst_number}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, gst_number: e.target.value })}
                                                 type="text"
                                                 className="form-control"
                                             />
@@ -482,10 +542,24 @@ const Customers = () => {
 
                                     <div className="col-lg-6 col-md-12">
                                         <div className="form-group">
-                                            <label>HUID</label>
+                                            <label>State</label>
+                                            <Select2
+                                                data={stateData}
+                                                value={currentItem.state}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, state: e.target.value })}
+                                                // type="text"
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+
+
+                                    <div className="col-lg-6 col-md-12">
+                                        <div className="form-group">
+                                            <label>PIN code</label>
                                             <input
-                                                value={currentItem.huid}
-                                                onChange={(e) => setCurrentItem({ ...currentItem, huid: e.target.value })}
+                                                value={currentItem.pincode}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, pincode: e.target.value })}
                                                 type="text"
                                                 className="form-control"
                                             />

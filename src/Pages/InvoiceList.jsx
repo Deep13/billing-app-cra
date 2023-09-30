@@ -25,15 +25,16 @@ const InvoiceList = () => {
 
     const [data, setData] = useState([])
     const [currentItem, setCurrentItem] = useState({
-        invoice_id: '',
-        code: '',
-        desc: '',
-        pcs: '',
-        gross_wt: '',
-        net_wt: '',
-        stone_wt: '',
-        fixed_charges: '',
-        hsn: ''
+        code: 'fkdsjfl6543',
+        desc: 'any desc is allowed',
+        pcs: 5,
+        gross_wt: 66,
+        net_wt: 70,
+        stone_wt: 20,
+        making_charge: 6500,
+        fixed_charge: 2500,
+        amount: 60000,
+        hsn: 'wowowow'
     })
     const [menu, setMenu] = useState(false);
     const [show, setShow] = useState(false);
@@ -49,10 +50,10 @@ const InvoiceList = () => {
     const handleAddItem = () => {
 
         if (editMode && currentItem) {
-            updateCustomer(currentItem)
+            updateInvoice(currentItem)
         }
         else {
-            InsertCustomerToDb(currentItem)
+            InsertInvoiceToDb(currentItem)
         }
         setEditMode(false)
     }
@@ -63,7 +64,7 @@ const InvoiceList = () => {
     const columns = [
         {
             title: "Invoice ID",
-            dataIndex: "inovice_id",
+            dataIndex: "invoice_id",
             sorter: (a, b) => a.Id.length - b.Id.length,
         },
         {
@@ -83,7 +84,7 @@ const InvoiceList = () => {
         },
 
         {
-            title: "Id Gross wt.",
+            title: "Gross wt.",
             dataIndex: "gross_wt",
             sorter: (a, b) => a.Purity.length - b.Purity.length,
         },
@@ -147,7 +148,7 @@ const InvoiceList = () => {
                     </Link> */}
                     <div
                         onClick={() => {
-                            deleteThisCustomer(record)
+                            deleteInvoice(record.invoice_id)
                         }}
                         className="btn btn-danger">
                         delete
@@ -161,7 +162,7 @@ const InvoiceList = () => {
 
     const InsertInvoiceToDb = (invoice) => {
         $.ajax({
-            url: 'http://localhost:80/billing_api/customers.php',
+            url: 'http://localhost:80/billing_api/invoice.php',
             type: "POST",
             data: {
                 method: "insertInvoice",
@@ -177,29 +178,15 @@ const InvoiceList = () => {
         });
     }
 
-    const updateInvoice = (invoice) => {
+    const updateInvoice = (thisInvoice) => {
         $.ajax({
-            url: 'http://localhost:80/billing_api/customers.php',
+            url: 'http://localhost:80/billing_api/invoice.php',
             type: 'POST',
             data: {
-                method: 'updateInvoice', // Updated method name to match your PHP function
-                data: JSON.stringify({ ...invoice }),
+                method: 'updateTheInvoice',
+                data: JSON.stringify({ ...thisInvoice }),
             },
             success: function (dataClient) {
-                // Check the response dataClient to see if the update was successful
-                // var response = JSON.parse(dataClient);
-                // if (response[0] === 'Update successful') {
-                // var editValue = data.map(val => {
-                //   if (val.id === currentItem.id) {
-                //     val.item = item;
-                //   }
-                //   return val;
-                // });
-                //   console.log('Update successful:', response[0]);
-                //   setCurrentItem(null);
-                // } else {
-                //   console.log('Update failed:', response[0]);
-                // }
                 console.log(dataClient);
                 refreshData();
             },
@@ -210,18 +197,22 @@ const InvoiceList = () => {
 
     }
 
-    const deleteThisCustomer = (customer) => {
+    const deleteInvoice = (invoice_id) => {
         $.ajax({
-            url: 'http://localhost:80/billing_api/customers.php',
+            url: 'http://localhost:80/billing_api/invoice.php',
             type: "POST",
             data: {
-                method: "deleteStock",
-                data: JSON.stringify({ id: customer.id }),
+                method: "deleteInvoice",
+                data: JSON.stringify({ invoice_id: invoice_id }),
             },
             success: function (dataClient) {
                 // setitem('')
-                console.log(JSON.parse(dataClient))
-                refreshData();
+                try {
+                    console.log(JSON.parse(dataClient))
+                    refreshData();
+                } catch (e) {
+                    console.log(e)
+                }
             },
             error: function (request, error) {
                 console.log('Error')
@@ -252,14 +243,18 @@ const InvoiceList = () => {
 
     const refreshData = () => {
         $.ajax({
-            url: 'http://localhost:80/billing_api/customers.php',
+            url: 'http://localhost:80/billing_api/invoice.php',
             type: "POST",
             data: {
-                method: "getCustomers",
+                method: "getInvoices",
             },
             success: function (dataClient) {
-                console.log(JSON.parse(dataClient));
-                setData(JSON.parse(dataClient))
+                try {
+                    console.log(dataClient);
+                    setData(JSON.parse(dataClient))
+                } catch (e) {
+                    console.log(e)
+                }
             },
             error: function (request, error) {
                 console.log('Error')
@@ -325,14 +320,16 @@ const InvoiceList = () => {
                                                 to="#"
                                                 onClick={() => {
                                                     setCurrentItem({
-                                                        orm_desc: '',
-                                                        om_code: '',
-                                                        purity: '',
+                                                        code: '',
+                                                        desc: '',
+                                                        pcs: '',
                                                         gross_wt: '',
                                                         net_wt: '',
                                                         stone_wt: '',
-                                                        qty: '',
-                                                        huid: '',
+                                                        making_charge: '',
+                                                        fixed_charges: '',
+                                                        amount: '',
+                                                        hsn: ''
                                                     })
                                                     setEditMode(false)
                                                 }}
@@ -393,15 +390,32 @@ const InvoiceList = () => {
                             </div>
                             <div className="modal-body">
                                 <div className="row">
+
                                     <div className="col-lg-6 col-md-12">
                                         <div className="form-group">
-                                            <label>Desc</label>
+                                            <label>Code</label>
                                             <input
+                                                value={currentItem.code}
+                                                onChange={e => setCurrentItem({ ...currentItem, code: e.target.value })}
                                                 type="text"
                                                 className="form-control"
                                             />
                                         </div>
                                     </div>
+
+                                    <div className="col-lg-6 col-md-12">
+                                        <div className="form-group">
+                                            <label>Desc</label>
+                                            <input
+                                                value={currentItem.desc}
+                                                onChange={e => setCurrentItem({ ...currentItem, desc: e.target.value })}
+                                                type="text"
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+
+
 
                                     {/* <div className="col-lg-6 col-md-12">
                                         <div className="form-group mb-0">
@@ -420,15 +434,15 @@ const InvoiceList = () => {
                                         <div className="form-group">
                                             <label>Pcs</label>
                                             <input
-                                                value={currentItem.om_code}
-                                                onChange={(e) => setCurrentItem({ ...currentItem, om_code: e.target.value })}
+                                                value={currentItem.pcs}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, pcs: e.target.value })}
                                                 type="text"
                                                 className="form-control"
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="col-lg-6 col-md-12">
+                                    {/* <div className="col-lg-6 col-md-12">
                                         <div className="form-group mb-0">
                                             <label>Gross</label>
                                             <Select2
@@ -438,7 +452,7 @@ const InvoiceList = () => {
                                                 data={purityData}
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
 
 
                                     <div className="col-lg-6 col-md-12">
@@ -482,8 +496,8 @@ const InvoiceList = () => {
                                         <div className="form-group mb-0">
                                             <label>Making Charges</label>
                                             <input
-                                                value={currentItem.qty}
-                                                onChange={(e) => setCurrentItem({ ...currentItem, qty: e.target.value })}
+                                                value={currentItem.making_charge}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, making_charge: e.target.value })}
                                                 type="text"
                                                 className="form-control"
                                             />
@@ -495,8 +509,8 @@ const InvoiceList = () => {
                                         <div className="form-group">
                                             <label>HSN</label>
                                             <input
-                                                value={currentItem.huid}
-                                                onChange={(e) => setCurrentItem({ ...currentItem, huid: e.target.value })}
+                                                value={currentItem.hsn}
+                                                onChange={(e) => setCurrentItem({ ...currentItem, hsn: e.target.value })}
                                                 type="text"
                                                 className="form-control"
                                             />

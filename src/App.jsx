@@ -17,11 +17,13 @@ import InvoiceFormat from './components/InvoiceFormat'
 
 function App() {
 
+  const [salesmanCode ,setSalesmanCode] = useState('')
+
   return (
     <>
       <div className='h-[100vh] w-full'>
         <Routes>
-          <Route path='/billing/' element={<Login />} />
+          <Route path='/billing' element={<Login setSalesmanCode={setSalesmanCode} />} />
           {/* <Route path='/login' element={<Login />} /> */}
           <Route path='/stock-management' element={<StockManagement />} />
           <Route path='/master-data' element={<MasterData />} >
@@ -53,7 +55,7 @@ function App() {
           <Route path='/expense-management' element={<ExpenseManagement />} />
           <Route path='/daily-expenses' element={<DailyExpenses />} />
           <Route path='/invoice-management' element={<InvoiceManagement />} />
-          <Route path='/buyer-module' element={<BuyerModule />} />
+          <Route path='/buyer-module' element={<BuyerModule salesmanCode={salesmanCode} />} />
         </Routes>
       </div>
     </>

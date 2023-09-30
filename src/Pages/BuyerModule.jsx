@@ -10,7 +10,7 @@ import FeatherIcon from "feather-icons-react";
 import TableRow from "../components/TableRow";
 // import Select2 from "react-select2-wrapper";
 
-const BuyerModule = () => {
+const BuyerModule = ({ salesmanCode }) => {
   const [menu, setMenu] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const navigate = useNavigate()
@@ -19,16 +19,16 @@ const BuyerModule = () => {
   };
 
   const [invoiceData, setInvoiceData] = useState({
-    ContactNumber: '800332182325',
-    CustomerName: 'Mohit',
-    IdType: 'PAN',
-    CardNumber: '2245038',
-    Address: 'Home',
+    ContactNumber: '',
+    CustomerName: '',
+    IdType: '',
+    CardNumber: '',
+    Address: '',
     DueDate: '',
-    State: 'West Bengal',
+    State: '',
     InovoiceDate: '',
     GstNumber: '',
-    CityPin: '341510',
+    CityPin: '',
     items: [
       {
         product: 'Gold  Chain',
@@ -221,9 +221,9 @@ const BuyerModule = () => {
     });
   }
 
-  const handleCardType = (e) => {
-    setCardType(e.target.value)
-  }
+  // const handleCardType = (e) => {
+  //   setCardType(e.target.value)
+  // }
 
   const handleTypeChange = (e) => {
     // setTypeOption(e.target.value)
@@ -352,6 +352,39 @@ const BuyerModule = () => {
     });
   }
 
+
+  const getCustomerByContact = (contact_number) => {
+    $.ajax({
+      url: 'http://localhost:80/billing_api/customers.php',
+      type: "POST",
+      data: {
+        method: "getCustomerByContact",
+        data: JSON.stringify({ contact_number: contact_number }),
+      },
+      success: function (dataClient) {
+        let thisData = JSON.parse(dataClient)
+        console.log(thisData);
+        if (dataClient.includes('not found')) {
+          alert('Customer not registered with Entered Contact number')
+        } else {
+          setInvoiceData({
+            ...invoiceData,
+            CustomerName: thisData.name,
+            Address: thisData.address,
+            State: thisData.state,
+            GstNumber: thisData.gst_number,
+            IdType: thisData.id_type,
+            CardNumber: thisData.id_value,
+            CityPin: thisData.pincode,
+          })
+        }
+      },
+      error: function (request, error) {
+        console.log('Error')
+      },
+    });
+  }
+
   useEffect(() => {
     refreshData()
     let elements = Array.from(
@@ -391,6 +424,12 @@ const BuyerModule = () => {
                               type="text"
                               className="form-control"
                               placeholder="Your Phone Number"
+                              onKeyUp={(e) => {
+                                if (e.key === 'Enter') {
+                                  getCustomerByContact(e.target.value)
+                                  // console.log(e.target.value)
+                                }
+                              }}
                             />
                           </div>
                         </div>
@@ -401,6 +440,7 @@ const BuyerModule = () => {
                             <label>Address</label>
                             <textarea
                               disabled={disable}
+                              value={invoiceData.Address}
                               className="form-control"
                               placeholder="Enter Address"
                               defaultValue={""}
@@ -431,6 +471,7 @@ const BuyerModule = () => {
                                 <input
                                   disabled={disable}
                                   type="text"
+                                  value={invoiceData.CustomerName}
                                   className="form-control"
                                   placeholder="Name"
                                 />
@@ -467,6 +508,7 @@ const BuyerModule = () => {
                           <div className="form-group">
                             <label>GST Number</label>
                             <input
+                              value={invoiceData.GstNumber}
                               disabled={disable}
                               type="text"
                               className="form-control"
@@ -536,8 +578,9 @@ const BuyerModule = () => {
                             <label>ID Type</label>
                             <br />
                             <Select2
-                              // disabled={disable}
-                              onChange={handleCardType}
+                              disabled={disable}
+                              value={invoiceData.IdType}
+                              onChange={() => { }}
                               className='form-control relative'
                               data={idChoices}
                             />
@@ -546,6 +589,7 @@ const BuyerModule = () => {
                             {/* <label>Card Number</label> */}
                             <br />
                             <input
+                              value={invoiceData.CardNumber}
                               disabled={disable}
                               className='form-control relative'
                               placeholder={`Enter your ${cardType} number here`}
@@ -556,6 +600,7 @@ const BuyerModule = () => {
                           <div className="form-group">
                             <label>State</label>
                             <Select2
+                              value={invoiceData.State}
                               disabled={disable}
                               className='form-control relative'
                               data={state}
@@ -566,6 +611,7 @@ const BuyerModule = () => {
                           <div className="form-group">
                             <label>City PIN</label>
                             <input
+                              value={invoiceData.CityPin}
                               disabled={disable}
                               type="text"
                               className="form-control"
@@ -630,8 +676,10 @@ const BuyerModule = () => {
                       <div className="col-lg-3 col-md-12">
                         <div className="form-group">
                           <label>Salesman Code</label>
-                          <Select2
-                            onChange={handleTypeChange}
+                          <input
+                            value={salesmanCode}
+                            disabled
+                            // onChange={handleTypeChange}
                             className="form-control w-100"
                             data={jewelleryType}
                           />

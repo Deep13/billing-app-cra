@@ -11,15 +11,15 @@ const schema = yup
 
         email: yup
             .string()
-            .matches(emailrgx, 'Email is required')
+            // .matches(emailrgx, 'Email is required')
             .required('Email is required')
             .trim(),
         password: yup.string().min(6)
-            .max(6).required('Password is required')
+            .max(20).required('Password is required')
             .trim(),
     })
 
-const Login = (props) => {
+const Login = ({ setSalesmanCode }) => {
 
     const [eye, seteye] = useState(true);
     const [emailerror, setEmailError] = useState("");
@@ -44,17 +44,48 @@ const Login = (props) => {
         defaultValues: inputValues,
     })
 
+    const authenticateUser = (data) => {
+        const { email, password } = data;
+        // console.log(data)
+        $.ajax({
+            url: 'http://localhost:80/billing_api/users.php',
+            type: "POST",
+            data: {
+                method: "login",
+                data: JSON.stringify({ password: password, user_name: email })
+            },
+            success: function (dataClient) {
+                try {
+                    // console.log(dataClient);
+                    console.log(JSON.parse(dataClient))
+                    let thisData = JSON.parse(dataClient)
+                    if (thisData.prompt === 'Authentication successful') {
+                        navigate('/master-data')
+                        setSalesmanCode(thisData.id)
+                    } else if (dataClient === 'Authentication failed') {
+                        alert('Invalid credentials')
+                    }
+                } catch (e) {
+                    console.log(e)
+                }
+            },
+            error: function (request, error) {
+                console.log('Error')
+                alert('Some error occured')
+            }
+        });
+    }
+
     const onSubmit = (data) => {
         console.log("data", data)
 
-        if (data.password != "123456") {
+        if (data.password !== "123456") {
             setError('password', {
                 message: 'password is mismatch',
             })
         } else {
             clearErrors('password')
             navigate('/master-data')
-
         }
     }
 
@@ -81,7 +112,7 @@ const Login = (props) => {
                                     <h1>Login</h1>
                                     <p className="account-subtitle">Access to our dashboard</p>
                                     <div>
-                                        <form onSubmit={handleSubmit(onSubmit)}>
+                                        <form onSubmit={handleSubmit(authenticateUser)}>
 
                                             <div className="form-group input_text">
                                                 <label className="form-control-label">Email Address</label>
