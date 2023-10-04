@@ -115,7 +115,7 @@ const Login = ({ setSalesmanCode }) => {
                                         <form onSubmit={handleSubmit(authenticateUser)}>
 
                                             <div className="form-group input_text">
-                                                <label className="form-control-label">Email Address</label>
+                                                <label className="form-control-label">Username</label>
                                                 <Controller
                                                     name="email"
                                                     control={control}
@@ -185,7 +185,7 @@ const Login = ({ setSalesmanCode }) => {
                                         {/* /Social Login */}
                                         <div className="text-center dont-have">
                                             Dont have an account yet?
-                                            <Link to="/register">Register</Link>
+                                            <Link to="/signup">Register</Link>
                                         </div>
                                     </div>
                                 </div>
