@@ -8,15 +8,152 @@ import Select2 from '../components/SelectDropdown'
 // import { Logo, signature, circle1, circle2 } from "../components/imagepath";
 import FeatherIcon from "feather-icons-react";
 import TableRow from "../components/TableRow";
+import InvoiceFormat from "../components/InvoiceFormat";
 // import Select2 from "react-select2-wrapper";
+import { Table } from "antd";
 
-const BuyerModule = ({ salesmanCode }) => {
+import $ from 'jquery'
+const BuyerModule = () => {
   const [menu, setMenu] = useState(false);
-  const [startDate, setStartDate] = useState(new Date());
+  const [HMCharge, setHMCharge] = useState(false);
+  const [total, settotal] = useState(0);
+  const [Loading, setLoading] = useState(false);
+  const [CGSTTax, setCGSTTax] = useState(0);
+  const [SGSTTax, setSGSTTax] = useState(0);
+  const [discount, setdiscount] = useState(0);
+  const [manualdiscount, setmanualdiscount] = useState(0);
+  const [roundoff, setroundoff] = useState(0);
+  const [isroundoff, setisroundoff] = useState(false);
+  const salesmanCode = localStorage.getItem('logid') ? JSON.parse(localStorage.getItem('logid')) : null;
   const navigate = useNavigate()
   const toggleMobileMenu = () => {
     setMenu(!menu);
   };
+  const columns = [
+    {
+      title: "Code",
+      dataIndex: "om_code",
+      sorter: (a, b) => a.id.length - b.id.length,
+      render: (text, data, index) =>
+        <input
+          onKeyDown={(e) => {
+            if (e.key == 'Enter') {
+              getStockData(e.target.value, index);
+            }
+            // 
+          }
+          }
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].om_code = e.target.value;
+            setTableItems([...temp])
+          }} value={text} type="text" />
+
+    },
+    {
+      title: "Description",
+      dataIndex: "orm_desc",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text) =>
+        <input
+          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+    },
+    {
+      title: "Pcs",
+      dataIndex: "qty",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text) =>
+        <input
+          onChange={(e, a, b) => console.log(e.target.value, a, b)} value={text} type="text" />
+    },
+    {
+      title: "Gross",
+      dataIndex: "gross_wt",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text) =>
+        <input
+          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+    },
+    {
+      title: "Net",
+      dataIndex: "net_wt",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text) =>
+        <input
+          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+    }, {
+      title: "Value",
+      dataIndex: "value",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text) =>
+        <input
+          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+    }, {
+      title: "Making",
+      dataIndex: "making",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text, data, index) =>
+        <input
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].making = e.target.value;
+            var hmVal = 0
+            if (e.target.value) {
+              hmVal = e.target.value;
+            }
+
+
+            temp[index].amount = (parseFloat(temp[index].net_wt) * parseFloat(invoiceData.rate ? invoiceData.rate : 1)) + parseFloat(temp[index].hmcharge) + parseFloat(hmVal);
+            setTableItems([...temp])
+          }} value={text} type="text" />
+    }, {
+      title: "St. Wt",
+      dataIndex: "stone_wt",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text) =>
+        <input
+          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+    }, {
+      title: "St. Val",
+      dataIndex: "suffix",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text) =>
+        <input
+          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+    }, {
+      title: "HM Charge",
+      dataIndex: "hmcharge",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text, data, index) =>
+        <input
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].hmcharge = e.target.value;
+            var hmVal = 0
+            if (e.target.value) {
+              hmVal = e.target.value;
+            }
+
+
+            temp[index].amount = (parseFloat(temp[index].net_wt) * parseFloat(invoiceData.rate ? invoiceData.rate : 1)) + parseFloat(hmVal) + parseFloat(temp[index].making);
+            setTableItems([...temp])
+          }} value={text} type="text" />
+    }, {
+      title: "Amount",
+      dataIndex: "amount",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text) =>
+        <input
+          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+    }, {
+      title: "HUID",
+      dataIndex: "huid",
+      sorter: (a, b) => a.item.length - b.item.length,
+      render: (text) =>
+        <input
+          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+    },
+  ];
 
   const [invoiceData, setInvoiceData] = useState({
     ContactNumber: '',
@@ -29,32 +166,6 @@ const BuyerModule = ({ salesmanCode }) => {
     InovoiceDate: '',
     GstNumber: '',
     CityPin: '',
-    items: [
-      {
-        product: 'Gold  Chain',
-        type: 'gold ornament',
-        purity: 0,
-        rate: 0,
-        desc: 'very good',
-        pcs: 0,
-        gross: 0,
-        net: 0,
-        amount: 0,
-        making_chares: 0,
-      },
-      {
-        product: 'Platinum ring',
-        type: 'platinum ornament',
-        purity: 0,
-        rate: 0,
-        desc: 'good one',
-        pcs: 3,
-        gross: 45,
-        net: 64,
-        amount: 18500,
-        making_chares: 20000,
-      },
-    ],
     PaymentMode: 'Cash',
     Notes: '',
     DiscountedPrice: '145000',
@@ -63,50 +174,38 @@ const BuyerModule = ({ salesmanCode }) => {
     TotalAmount: '165000',
   })
 
-  const [addProduct, setAddProduct] = useState(false)
   const [disable, setDisable] = useState(false)
   const [purityChoices, setPurityChoices] = useState([])
   const [idChoices, setIdChoices] = useState([])
   const [gstEntries, setGstEntries] = useState([])
   const [ornamentTypes, setOrnamentTypes] = useState([])
-
-  const [product, setProduct] = useState([
-    { id: 1, text: "Choose Customer" },
-    { id: 2, text: "Customer 1" },
-    { id: 3, text: "Customer 2" },
-    { id: 4, text: "Customer 3" },
-  ]);
-
   const state = [
-    { item: 'Andhra Pradesh' },
-    { item: 'Arunachal Pradesh' },
-    { item: 'Assam' },
-    { item: 'Bihar' },
-    { item: 'Chhattisgarh' },
-    { item: 'Goa' },
-    { item: 'Gujarat' },
-    { item: 'Haryana' },
-    { item: 'Himachal Pradesh' },
-    { item: 'Jharkhand' },
-    { item: 'Karnataka' },
-    { item: 'Kerala' },
-    { item: 'Madhya Pradesh' },
-    { item: 'Maharashtra' },
-    { item: 'Manipur' },
-    { item: 'Meghalaya' },
-    { item: 'Mizoram' },
-    { item: 'Nagaland' },
-    { item: 'Odisha' },
-    { item: 'Punjab' },
-    { item: 'Rajasthan' },
-    { item: 'Sikkim' },
-    { item: 'Tamil Nadu' },
-    { item: 'Telangana' },
-    { item: 'Tripura' },
-    { item: 'Uttar Pradesh' },
-    { item: 'Uttarakhand' },
-    { item: 'West Bengal' }
-  ]
+    { id: 4, item: 'Andhra Pradesh' },
+    { id: 5, item: 'Arunachal Pradesh' },
+    { id: 6, item: 'Assam' },
+    { id: 7, item: 'Bihar' },
+    { id: 8, item: 'Chhattisgarh' },
+    { id: 9, item: 'Goa' },
+    { id: 10, item: 'Gujarat' },
+    { id: 11, item: 'Haryana' },
+    { id: 12, item: 'Himachal Pradesh' },
+    { id: 13, item: 'Jharkhand' },
+    { id: 14, item: 'Karnataka' },
+    { id: 15, item: 'Kerala' },
+    { id: 16, item: 'Madhya Pradesh' },
+    { id: 17, item: 'Maharashtra' },
+    { id: 18, item: 'Manipur' },
+    { id: 19, item: 'Meghalaya' },
+    { id: 20, item: 'Mizoram' },
+    { id: 21, item: 'Nagaland' },
+    { id: 22, item: 'Odisha' },
+    { id: 23, item: 'Punjab' },
+    { id: 24, item: 'Rajasthan' },
+    { id: 25, item: 'Sikkim' },
+    { id: 26, item: 'Tamil Nadu' },
+    { id: 27, item: 'Telangana' },
+    { id: 28, item: 'Tripura' }
+  ];
 
   const [jewelleryType, setJewelleryType] = useState([
     { item: "Diamond Necklace" },
@@ -133,20 +232,7 @@ const BuyerModule = ({ salesmanCode }) => {
     amount: 0,
     making_chares: 0,
   })
-  const [tableItems, setTableItems] = useState([
-    {
-      product: 'Product1',
-      type: 'Gold',
-      purity: 54,
-      rate: 64000,
-      desc: 'very good',
-      pcs: 2,
-      gross: 153500,
-      net: 153600,
-      amount: 156000,
-      making_chares: 12000,
-    }
-  ])
+  const [tableItems, setTableItems] = useState([{ "id": "", "entry_date": "", "orm_desc": "", "om_code": "", "purity": "", "gross_wt": "", "net_wt": "", "stone_wt": "", "qty": "", "huid": "" }])
   const productRef = useRef()
   // const typeRef = useRef()
   const purityRef = useRef()
@@ -158,68 +244,11 @@ const BuyerModule = ({ salesmanCode }) => {
   const amountRef = useRef()
   const makingChargesRef = useRef()
 
-
-
-  const [idType, setIdType] = useState([
-    { id: 1, text: "Aadhar Card" },
-    { id: 3, text: "PAN Card" },
-    { id: 2, text: "Driving License" },
-    { id: 4, text: "Voter Id" }
-  ])
-
-  const [productOption, setProductOption] = useState([
-    { id: 1, text: "Select Product" },
-    { id: 2, text: "Product 1" },
-    { id: 3, text: "Product 2" },
-    { id: 4, text: "Product 3" },
-  ]);
-
-  const [currency, setCurrency] = useState([
-    { id: 1, text: "Select Currency" },
-    { id: 2, text: "US dollar" },
-    { id: 3, text: "Euro" },
-    { id: 4, text: "Pound sterling" },
-    { id: 5, text: "Swiss franc" },
-  ]);
-
-  const [percentage, setPercentage] = useState([
-    { id: 1, text: "Percentage(%)" },
-    { id: 2, text: "0%" },
-    { id: 3, text: "5%" },
-    { id: 4, text: "10%" },
-    { id: 5, text: "15%" },
-  ]);
-
   const [editMode, setEditMode] = useState(false)
-
-  const [tax, setTax] = useState([
-    { id: 1, text: "N/A" },
-    { id: 2, text: "5%" },
-    { id: 3, text: "10%" },
-    { id: 4, text: "15%" },
-  ]);
 
   const [typeOption, setTypeOption] = useState()
   const [cardType, setCardType] = useState('card')
 
-  const getStockData = (huid) => {
-    debugger;
-    $.ajax({
-      url: 'http://localhost:80/billing_api/index.php',
-      type: "POST",
-      data: {
-        method: "getStockByHuid",
-        data: JSON.stringify({ huid: huid }),
-      },
-      success: function (dataClient) {
-        console.log(JSON.parse(dataClient));
-        // setPurityChoices(JSON.parse(dataClient))
-      },
-      error: function (request, error) {
-        console.log('Error')
-      }
-    });
-  }
 
   // const handleCardType = (e) => {
   //   setCardType(e.target.value)
@@ -230,26 +259,229 @@ const BuyerModule = ({ salesmanCode }) => {
   }
 
   const handleOnEnterAnyTableData = () => {
-    // if() {
-    //   setTableItems(prev => [
-    //     ...prev,
-    //     {
-    //       product: '',
-    //       type: '',
-    //       purity: 0,
-    //       rate: 0,
-    //       desc: '',
-    //       pcs: 0,
-    //       gross: 0,
-    //       net: 0,
-    //       amount: 0,
-    //       making_chares: 0,
-    //     }
-    //   ])
-    // }
-    getStockByHuid
+
   }
 
+  const getEinvoice = () => {
+    // setLoading(true);
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+      "username": "testeway@mastersindia.co",
+      "password": "!@#Demo!@#123",
+      "client_id": "fIXefFyxGNfDWOcCWnj",
+      "client_secret": "QFd6dZvCGqckabKxTapfZgJc",
+      "grant_type": "password"
+    });
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    fetch("https://clientbasic.mastersindia.co/oauth/access_token", requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        var access_token = result.access_token;
+        if (access_token) {
+          var raw = JSON.stringify({
+            "access_token": access_token,
+            "user_gstin": "09AAAPG7885R002",
+            "data_source": "erp",
+            "transaction_details": {
+              "supply_type": "B2B"
+            },
+            "document_details": {
+              "document_type": "INV",
+              "document_number": "MIPL/101",
+              "document_date": new Date().toLocaleDateString()
+            },
+            "seller_details": {
+              "gstin": "09AAAPG7885R002",
+              "legal_name": "MastersIndia UP",
+              "trade_name": "MastersIndia UP",
+              "address1": "Vila",
+              "address2": "Vila",
+              "location": "Noida",
+              "pincode": 201301,
+              "state_code": "UTTAR PRADESH",
+              "phone_number": 9876543231,
+              "email": ""
+            },
+            "buyer_details": {
+              "gstin": "05AAAPG7885R002",
+              "legal_name": "MastersIndia UT",
+              "trade_name": "MastersIndia UT",
+              "address1": "Kila",
+              "address2": "Kila",
+              "location": "Nainital",
+              "pincode": 263001,
+              "place_of_supply": "5",
+              "state_code": "UTTARAKHAND",
+              "phone_number": 9876543231,
+              "email": ""
+            },
+            "dispatch_details": {
+              "company_name": "MastersIndia UP",
+              "address1": "Vila",
+              "address2": "Vila",
+              "location": "Noida",
+              "pincode": 201301,
+              "state_code": "UTTAR PRADESH"
+            },
+            "ship_details": {
+              "gstin": "05AAAPG7885R002",
+              "legal_name": "MastersIndia UT",
+              "trade_name": "MastersIndia UT",
+              "address1": "Kila",
+              "address2": "Kila",
+              "location": "Nainital",
+              "pincode": 263001,
+              "state_code": "UTTARAKHAND"
+            },
+            "export_details": {
+              "ship_bill_number": "",
+              "ship_bill_date": "12/08/2022",
+              "country_code": "IN",
+              "foreign_currency": "INR",
+              "refund_claim": "N",
+              "port_code": "",
+              "export_duty": 2534.34
+            },
+            "payment_details": {
+              "bank_account_number": "Account Details",
+              "paid_balance_amount": 100,
+              "credit_days": 2,
+              "credit_transfer": "Credit Transfer",
+              "direct_debit": "Direct Debit",
+              "branch_or_ifsc": "KKK000180",
+              "payment_mode": "CASH",
+              "payee_name": "Payee Name",
+              "outstanding_amount": 1.9,
+              "payment_instruction": "Payment Instruction",
+              "payment_term": "Terms of Payment"
+            },
+            "reference_details": {
+              "invoice_remarks": "Invoice Remarks",
+              "document_period_details": {
+                "invoice_period_start_date": "2022-08-06",
+                "invoice_period_end_date": "2023-08-07"
+              },
+              "preceding_document_details": [
+                {
+                  "reference_of_original_invoice": "CFRT/0006",
+                  "preceding_invoice_date": "07/03/2020",
+                  "other_reference": "2334"
+                }
+              ],
+              "contract_details": [
+                {
+                  "receipt_advice_number": "aaa",
+                  "receipt_advice_date": "07/03/2020",
+                  "batch_reference_number": "2334",
+                  "contract_reference_number": "2334",
+                  "other_reference": "2334",
+                  "project_reference_number": "2334",
+                  "vendor_po_reference_number": "233433454545",
+                  "vendor_po_reference_date": "07/02/2022"
+                }
+              ]
+            },
+            "additional_document_details": [
+              {
+                "supporting_document_url": "asafsd",
+                "supporting_document": "india",
+                "additional_information": "india"
+              }
+            ],
+            "value_details": {
+              "total_assessable_value": 4,
+              "total_cgst_value": 0,
+              "total_sgst_value": 0,
+              "total_igst_value": 0.2,
+              "total_cess_value": 0,
+              "total_cess_value_of_state": 0,
+              "total_discount": 0,
+              "total_other_charge": 0,
+              "total_invoice_value": 4.2,
+              "round_off_amount": 0,
+              "total_invoice_value_additional_currency": 0
+            },
+            "ewaybill_details": {
+              "transporter_id": "05AAABB0639G1Z8",
+              "transporter_name": "Jay Trans",
+              "transportation_mode": "1",
+              "transportation_distance": "0",
+              "transporter_document_number": "1230",
+              "transporter_document_date": "12/08/2022",
+              "vehicle_number": "PQR1234",
+              "vehicle_type": "R"
+            },
+            "item_list": [
+              {
+                "item_serial_number": "501",
+                "product_description": "Wheat desc",
+                "is_service": "N",
+                "hsn_code": "1001",
+                "bar_code": "1212",
+                "quantity": 1,
+                "free_quantity": 0,
+                "unit": "KGS",
+                "unit_price": 4,
+                "total_amount": 4,
+                "pre_tax_value": 0,
+                "discount": 0,
+                "other_charge": 0,
+                "assessable_value": 4,
+                "gst_rate": 5,
+                "igst_amount": 0.2,
+                "cgst_amount": 0,
+                "sgst_amount": 0,
+                "cess_rate": 0,
+                "cess_amount": 0,
+                "cess_nonadvol_amount": 0,
+                "state_cess_rate": 0,
+                "state_cess_amount": 0,
+                "state_cess_nonadvol_amount": 0,
+                "total_item_value": 4.2,
+                "country_origin": "",
+                "order_line_reference": "",
+                "product_serial_number": "",
+                "batch_details": {
+                  "name": "aaa",
+                  "expiry_date": "31/10/2022",
+                  "warranty_date": "31/10/2022"
+                },
+                "attribute_details": [
+                  {
+                    "item_attribute_details": "aaa",
+                    "item_attribute_value": "147852"
+                  }
+                ]
+              }
+            ]
+          });
+
+          var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+          };
+
+          fetch("https://clientbasic.mastersindia.co/generateEinvoice", requestOptions)
+            .then(response => response.text())
+            .then(result => console.log(result))
+            .catch(error => console.log('error', error));
+        }
+
+      })
+      .catch(error => console.log('error', error));
+
+  }
   const AddItemToTable = () => {
     //reset items first
 
@@ -343,8 +575,23 @@ const BuyerModule = ({ salesmanCode }) => {
         method: "getGstEntry",
       },
       success: function (dataClient) {
-        console.log(JSON.parse(dataClient));
-        setGstEntries(JSON.parse(dataClient))
+        var GST = JSON.parse(dataClient);
+        setGstEntries({ CGST: parseFloat(GST[0].value) / 2, SGST: parseFloat(GST[0].value) / 2 })
+      },
+      error: function (request, error) {
+        console.log('Error')
+      }
+    });
+
+    $.ajax({
+      url: 'http://localhost:80/billing_api/index.php',
+      type: "POST",
+      data: {
+        method: "getHmCharge",
+      },
+      success: function (dataClient) {
+        var temp = JSON.parse(dataClient)[0];
+        setHMCharge(temp.item)
       },
       error: function (request, error) {
         console.log('Error')
@@ -352,41 +599,132 @@ const BuyerModule = ({ salesmanCode }) => {
     });
   }
 
+  useEffect(() => {
+    recalculate();
 
-  const getCustomerByContact = (contact_number) => {
+  }, [tableItems, isroundoff, manualdiscount])
+
+  const recalculate = () => {
+    var temp = [...tableItems];
+    var total = 0;
+    temp.map(val => {
+      if (val.amount) {
+        total += val.amount;
+      }
+
+    });
+    if (total > 0) {
+      setCGSTTax((gstEntries.CGST / 100) * total);
+      setSGSTTax((gstEntries.SGST / 100) * total);
+      total += (gstEntries.CGST / 100) * total + (gstEntries.SGST / 100) * total;
+    }
+    else {
+      setCGSTTax(0);
+      setSGSTTax(0);
+    }
+
+    if (manualdiscount) {
+      let oldTotal = total;
+      if (manualdiscount.indexOf('%') !== -1) {
+
+        total = Math.round(total - (total * (parseFloat(manualdiscount) / 100)));
+
+      }
+      else {
+        total = total - parseFloat(manualdiscount);
+      }
+      setdiscount(Math.round(oldTotal - total));
+    }
+    else {
+      setdiscount(0)
+    }
+
+
+    if (isroundoff) {
+      var oldTotal = total;
+      total = Math.floor(total / 10) * 10;
+      var disc = oldTotal - total;
+      setroundoff(Math.round(disc * 100) / 100
+      );
+    }
+    else {
+      setroundoff(0);
+
+    }
+    settotal(Math.round(total * 100) / 100);
+  }
+
+
+  const getStockData = (omcode, index) => {
     $.ajax({
-      url: 'http://localhost:80/billing_api/customers.php',
+      url: 'http://localhost:80/billing_api/index.php',
       type: "POST",
       data: {
-        method: "getCustomerByContact",
-        data: JSON.stringify({ contact_number: contact_number }),
+        method: "getStockByORMCODE",
+        data: JSON.stringify({ omcode: omcode }),
       },
       success: function (dataClient) {
-        let thisData = JSON.parse(dataClient)
-        console.log(thisData);
-        if (dataClient.includes('not found')) {
-          alert('Customer not registered with Entered Contact number')
-        } else {
-          setInvoiceData({
-            ...invoiceData,
-            CustomerName: thisData.name,
-            Address: thisData.address,
-            State: thisData.state,
-            GstNumber: thisData.gst_number,
-            IdType: thisData.id_type,
-            CardNumber: thisData.id_value,
-            CityPin: thisData.pincode,
-          })
+        try {
+          var temp = [...tableItems];
+          temp[index] = JSON.parse(dataClient)[0];
+          temp[index].hmcharge = HMCharge;
+          temp[index].value = (parseFloat(temp[index].net_wt) * parseFloat(invoiceData.rate ? invoiceData.rate : 1));
+          temp[index].amount = (parseFloat(temp[index].net_wt) * parseFloat(invoiceData.rate ? invoiceData.rate : 1)) + parseFloat(HMCharge);
+          // var existing = [...tableItems.reverse(), { ...temp }];
+          // existing[0] = { "id": "", "entry_date": "", "orm_desc": "", "om_code": "", "purity": "", "gross_wt": "", "net_wt": "", "stone_wt": "", "qty": "", "huid": "", hmcharge: '' };
+          // existing = existing.reverse();
+          setTableItems([...temp])
+        } catch (e) {
+          console.log(e)
         }
       },
       error: function (request, error) {
         console.log('Error')
-      },
+      }
     });
+  }
+  const getCustomerByContact = (contact_number) => {
+    if (contact_number) {
+      $.ajax({
+        url: 'http://localhost:80/billing_api/customers.php',
+        type: "POST",
+        data: {
+          method: "getCustomerByContact",
+          data: JSON.stringify({ contact_number: contact_number }),
+        },
+        success: function (dataClient) {
+          try {
+            let thisData = JSON.parse(dataClient)
+            console.log(thisData);
+            if (dataClient.includes('not found')) {
+              alert('Customer not registered with Entered Contact number')
+            } else {
+              setInvoiceData({
+                ...invoiceData,
+                CustomerName: thisData.name,
+                Address: thisData.address,
+                State: thisData.state,
+                GstNumber: thisData.gst_number,
+                IdType: thisData.id_type,
+                CardNumber: thisData.id_value,
+                CityPin: thisData.pincode,
+              })
+            }
+          }
+          catch (e) {
+
+          }
+        },
+        error: function (request, error) {
+          console.log('Error')
+        },
+      });
+    }
   }
 
   useEffect(() => {
-    refreshData()
+    refreshData();
+    // getStockData('AY1')
     let elements = Array.from(
       document.getElementsByClassName("react-datepicker-wrapper")
     );
@@ -403,8 +741,8 @@ const BuyerModule = ({ salesmanCode }) => {
         {/* <!-- Page Wrapper --> */}
         <div className="page-wrapper">
           <div className="content container-fluid">
-            <div className="page-header flex justify-between items-center">
-              <div className="content-page-header">
+            <div className="page-header" style={{ display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <div className="content-page-header" style={{ marginBottom: 0 }}>
                 <h5>Buyer Module</h5>
               </div>
               <button disabled={!disable} onClick={() => setDisable(false)} className="btn btn-primary">Edit</button>
@@ -413,236 +751,101 @@ const BuyerModule = ({ salesmanCode }) => {
               <div className="col-md-12">
                 <div className="card">
                   <div className="card-body">
-                    <div className="form-group-item border-0 mb-0">
-                      <div className="row align-item-center">
-                        <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group">
-                            <label>Contact Number</label>
+                    <div style={{ flexDirection: 'row', flexWrap: 'wrap', display: 'flex', justifyContent: 'space-between' }}>
+                      <div className="form-group" style={{ width: '30%' }}>
+                        <label>Contact Number</label>
+                        <input
+                          disabled={disable}
+                          autoFocus
+                          type="text"
+                          className="form-control"
+                          placeholder="Your Phone Number"
+                          onKeyUp={(e) => {
+                            if (e.key === 'Enter') {
+                              getCustomerByContact(e.target.value)
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="form-group" style={{ width: '30%' }}>
+                        <label>Customer Name</label>
+                        <ul className="form-group">
+                          <li>
                             <input
-                              disabled={disable}
-                              autoFocus
-                              type="text"
-                              className="form-control"
-                              placeholder="Your Phone Number"
-                              onKeyUp={(e) => {
-                                if (e.key === 'Enter') {
-                                  getCustomerByContact(e.target.value)
-                                  // console.log(e.target.value)
-                                }
-                              }}
-                            />
-                          </div>
-                        </div>
-
-
-                        <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group notes-form-group-info">
-                            <label>Address</label>
-                            <textarea
-                              disabled={disable}
-                              value={invoiceData.Address}
-                              className="form-control"
-                              placeholder="Enter Address"
-                              defaultValue={""}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group">
-                            <label>Invoice Date</label>
-                            <div className="cal-icon cal-icon-info">
-                              <DatePicker
-                                disabled={disable}
-                                className="datetimepicker form-control"
-                                selected={startDate}
-                                onChange={(date) => setStartDate(date)}
-                              ></DatePicker>
-                              {/* <FeatherIcon icon="calendar"/> */}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group">
-                            <label>Customer Name</label>
-                            <ul className="form-group-plus css-equal-heights">
-                              <li>
-                                <input
-                                  disabled={disable}
-                                  type="text"
-                                  value={invoiceData.CustomerName}
-                                  className="form-control"
-                                  placeholder="Name"
-                                />
-                              </li>
-                              <li>
-                                {/* <Link
-                                  className="btn btn-primary form-plus-btn"
-                                  to="/add-customer"
-                                >
-                                  <i className="fe fe-plus-circle" />
-                                  <FeatherIcon icon="plus-circle" />
-                                </Link> */}
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-
-                        <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group">
-                            <label>Due Date</label>
-                            <div className="cal-icon cal-icon-info">
-                              <DatePicker
-                                disabled={disable}
-                                className="datetimepicker form-control"
-                                selected={startDate}
-                                onChange={(date) => setStartDate(date)}
-                              ></DatePicker>
-                            </div>
-                          </div>
-
-                        </div>
-
-                        <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group">
-                            <label>GST Number</label>
-                            <input
-                              value={invoiceData.GstNumber}
                               disabled={disable}
                               type="text"
+                              value={invoiceData.CustomerName}
                               className="form-control"
-                              placeholder="Enter GST Number"
+                              placeholder="Name"
                             />
-                          </div>
-                        </div>
-                        {/* //place it here */}
-
-                        {/* <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group d-flex align-items-end h-100">
-                            <label className="custom_check me-3">
-                              <input type="checkbox" name="invoice" />
-                              <span className="checkmark" /> Enable tax
-                            </label>
-                            <label className="custom_check">
-                              <input type="checkbox" name="re_invoice" />
-                              <span className="checkmark" /> Recurring Invoice
-                            </label>
-                          </div>
-                        </div> */}
-                        <div className="col-lg-12">
-                          {/* <div className="form-group">
-                            <label>Products</label>
-                            <ul className="form-group-plus css-equal-heights">
-                              <li>
-                                <select className="select">
-                                  <option>Select Product</option>
-                                  <option>Product 1</option>
-                                  <option>Product 2</option>
-                                  <option>Product 3</option>
-                                </select>
-                                <Select2
-                                  // className="w-100"
-                                  data={productOption}
-                                  options={{
-                                    placeholder: "Select Product",
-                                  }}
-                                />
-                              </li>
-                              <li>
-                                <Link
-                                  className="btn btn-primary form-plus-btn"
-                                  to="/add-product"
-                                >
-                                  <i className="fe fe-plus-circle" />
-                                  <FeatherIcon icon="plus-circle" />
-                                </Link>
-                              </li>
-                            </ul>
-                          </div> */}
-                        </div>
-                        {/* <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group">
-                            <label>Currency</label>
-                            <Select2
-                              // className="w-100"
-                              data={currency}
-                              options={{
-                                placeholder: "Select Currency",
-                              }}
-                            />
-                          </div>
-                        </div> */}
-                        <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group">
-                            <label>ID Type</label>
-                            <br />
-                            <Select2
-                              disabled={disable}
-                              value={invoiceData.IdType}
-                              onChange={() => { }}
-                              className='form-control relative'
-                              data={idChoices}
-                            />
-                          </div>
-                          <div className="form-group">
-                            {/* <label>Card Number</label> */}
-                            <br />
-                            <input
-                              value={invoiceData.CardNumber}
-                              disabled={disable}
-                              className='form-control relative'
-                              placeholder={`Enter your ${cardType} number here`}
-                            />
-                          </div>
-                        </div>
-                        <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group">
-                            <label>State</label>
-                            <Select2
-                              value={invoiceData.State}
-                              disabled={disable}
-                              className='form-control relative'
-                              data={state}
-                            />
-                          </div>
-                        </div>
-                        <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group">
-                            <label>City PIN</label>
-                            <input
-                              value={invoiceData.CityPin}
-                              disabled={disable}
-                              type="text"
-                              className="form-control"
-                              placeholder="Enter PIN code here"
-                            />
-                          </div>
+                          </li>
+                          <li>
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="form-group" style={{ width: '30%' }}>
+                        <label>GST Number</label>
+                        <input
+                          value={invoiceData.GstNumber}
+                          disabled={disable}
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter GST Number"
+                        />
+                      </div>
+                      <div className="form-group" style={{ width: '30%' }}>
+                        <label>Address</label>
+                        <textarea
+                          disabled={disable}
+                          value={invoiceData.Address}
+                          className="form-control"
+                          placeholder="Enter Address"
+                          defaultValue={""}
+                          rows={4}
+                        />
+                      </div>
+                      <div className="form-group" style={{ width: '30%' }}>
+                        <label>ID Type</label>
+                        <Select2
+                          disabled={disable}
+                          value={invoiceData.IdType}
+                          onChange={(e) => { setInvoiceData({ ...invoiceData, IdType: e.target.value }) }}
+                          className='form-control relative'
+                          data={idChoices}
+                        />
+                        <br />
+                        <input
+                          value={invoiceData.CardNumber}
+                          disabled={disable}
+                          className='form-control relative'
+                          placeholder={`Enter your ${cardType} number here`}
+                        />
+                      </div>
+                      <div className="form-group" style={{ width: '30%' }}>
+                        <label>State</label>
+                        <Select2
+                          value={invoiceData.State}
+                          disabled={disable}
+                          onChange={(e) => { setInvoiceData({ ...invoiceData, State: e.target.value }) }}
+                          className='form-control relative'
+                          data={state}
+                        />
+                        <br />
+                        <div className="form-group" >
+                          {/* <label>City PIN</label> */}
+                          <input
+                            value={invoiceData.CityPin}
+                            disabled={disable}
+                            type="text"
+                            className="form-control"
+                            placeholder="City PIN"
+                          />
                         </div>
                       </div>
+
                     </div>
                     <div className="col-lg-12 py-2 col-md-6 col-sm-12 flex justify-between items-center row">
-                      {/* <button
-                        data-bs-toggle="modal"
-                        data-bs-target="#add_discount"
-                        disabled={disable}
-                        onClick={() => {
-                          setEditMode(false)
-                          productRef.current.value = ''
-                          setTypeOption('')
-                          purityRef.current.value = ''
-                          rateRef.current.value = 0
-                          descRef.current.value = 0
-                          pcsRef.current.value = 0
-                          // grossRef.current,
-                          // netRef.current = 0,
-                          amountRef.current.value = 0
-                          makingChargesRef.current.value = 0
-                        }}
-                        className="btn btn-primary flex items-center gap-2">
-                        <FeatherIcon icon='plus' />
-                        Add Product
-                      </button> */}
+
                       <div className="col-lg-3 col-md-12">
                         <div className="form-group">
                           <label>Type</label>
@@ -666,18 +869,38 @@ const BuyerModule = ({ salesmanCode }) => {
                       <div className="col-lg-3 col-md-12">
                         <div className="form-group">
                           <label>Rate</label>
-                          <Select2
+                          <input
+                            value={invoiceData.rate}
+                            disabled={disable}
+                            className='form-control relative'
+                            onChange={e => {
+                              console.log(e.target.value); setInvoiceData({ ...invoiceData, rate: e.target.value })
+                              if (tableItems.length > 0) {
+                                var temp = [...tableItems];
+                                temp.map(val => {
+                                  if (val.om_code) {
+                                    val.value = (parseFloat(val.net_wt) * parseFloat(e.target.value ? e.target.value : 1));
+                                    val.amount = (parseFloat(val.net_wt) * parseFloat(e.target.value ? e.target.value : 1)) + parseFloat(val.hmcharge);
+                                  }
+
+                                })
+                                setTableItems([...temp])
+                              }
+
+                            }}
+                          />
+                          {/* <Select2
                             onChange={handleTypeChange}
                             className="form-control w-100"
                             data={jewelleryType}
-                          />
+                          /> */}
                         </div>
                       </div>
                       <div className="col-lg-3 col-md-12">
                         <div className="form-group">
                           <label>Salesman Code</label>
                           <input
-                            value={salesmanCode}
+                            value={salesmanCode?.user_name}
                             disabled
                             // onChange={handleTypeChange}
                             className="form-control w-100"
@@ -686,89 +909,27 @@ const BuyerModule = ({ salesmanCode }) => {
                         </div>
                       </div>
                     </div>
-                    <div className="form-group-item">
-                      <div className="card-table">
-                        <div className="card-body add-invoice">
-                          <div className="table-responsive">
-                            <table className="table table-center table-hover datatable">
-                              <thead className="thead-light">
-                                <tr>
-                                  <th>Code</th>
-                                  <th>Description</th>
-                                  <th>Pcs</th>
-                                  <th>Gross.</th>
-                                  <th>Net</th>
-                                  {/* <th>Value</th> */}
-                                  <th>Making</th>
-                                  <th>St. wt</th>
-                                  <th>St. Val</th>
-                                  <th>Fxd Chrgs</th>
-                                  <th>Amount</th>
-                                  <th>Hsn</th>
-                                  {/* <th>Making charges</th> */}
-                                  <th>Action</th>
-                                </tr>
-                              </thead>
-                              {
-                                tableItems.map((curr, index) => {
-                                  return (
-                                    <tbody key={curr.product + index}>
-                                      <tr >
-                                        <TableRow
-                                          getStockData={() => getStockData('10024')}
-                                          product={curr.product}
-                                          desc={curr.desc}
-                                          pcs={curr.pcs}
-                                          gross={curr.gross}
-                                          net={curr.net}
-                                          amount={curr.amount}
-                                          making_charges={curr.making_chares}
-                                          handleOnEnterAnyData={handleOnEnterAnyTableData}
-                                        />
-                                        <td className="d-flex align-items-center">
-                                          <button
-                                            to="#"
-                                            onClick={() => {
-                                              // setEditValues({ ...curr })
-                                              setEditMode(true)
-                                              productRef.current.value = curr.product
-                                              setTypeOption(curr.type)
-                                              purityRef.current.value = curr.purity
-                                              rateRef.current.value = curr.rate
-                                              descRef.current.value = curr.desc
-                                              pcsRef.current.value = curr.pcs
-                                              // grossRef.current,
-                                              // netRef.current = 0,
-                                              amountRef.current.value = curr.amount
-                                              makingChargesRef.current.value = curr.making_chares
-                                            }}
-                                            className="btn-action-icon me-2"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#add_discount"
-                                          >
-                                            <span>
-                                              {/* <i className="fe fe-edit" /> */}
-                                              <FeatherIcon icon="edit" />
-                                            </span>
-                                          </button>
-                                          <Link
-                                            to="#"
-                                            className="btn-action-icon"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#delete_discount"
-                                          >
-                                            <span>
-                                              {/* <i className="fe fe-trash-2" /> */}
-                                              <FeatherIcon icon="trash-2" />
-                                            </span>
-                                          </Link>
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  )
-                                })
-                              }
-                            </table>
+                    <button style={{ marginBottom: 10 }} onClick={() => {
+                      if (tableItems[tableItems.length - 1].om_code) {
+                        var table = [...tableItems];
+                        table.push({});
+                        setTableItems(table)
+                      }
+                    }} type="submit" className="btn btn-primary">
+                      Add Product
+                    </button>
+                    <div className="row">
+                      <div className="col-sm-12">
+                        <div className=" card-table">
+                          <div className="card-body">
+                            <div className="table-responsive table-hover table-striped">
+                              <Table
+                                pagination={false}
+                                columns={columns}
+                                dataSource={tableItems}
+                                rowKey={(record) => record.id}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -778,43 +939,29 @@ const BuyerModule = ({ salesmanCode }) => {
                         <div className="col-xl-6 col-lg-12">
                           <div className="form-group-bank">
                             <div className="invoice-total-box">
-                              {/* <div className="form-group">
-                              <label>Select Bank</label>
-                              <div className="bank-details">
-                                <Link
-                                  className="text-danger-light"
-                                  to="#"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#bank_details"
-                                >
-                                  <i className="fas fa-bank me-2" />
-                                  Add Bank Details
-                                </Link>
-                              </div>
-                            </div> */}
                               <p>
                                 Payment Mode
                               </p>
                               <div className="form-check">
-                                <input disabled={disable} className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" checked />
+                                <input onChange={(event) => setInvoiceData({ ...invoiceData, PaymentMode: 'Card' })} disabled={disable} className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" checked={invoiceData.PaymentMode == 'Card'} />
                                 <label className="form-check-label" >
                                   Card
                                 </label>
                               </div>
                               <div className="form-check">
-                                <input disabled={disable} className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" />
+                                <input onChange={(event) => setInvoiceData({ ...invoiceData, PaymentMode: 'Cash' })} disabled={disable} className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" checked={invoiceData.PaymentMode == 'Cash'} />
                                 <label className="form-check-label" >
                                   Cash
                                 </label>
                               </div>
                               <div className="form-check">
-                                <input disabled={disable} className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" />
+                                <input disabled={disable} onChange={(event) => setInvoiceData({ ...invoiceData, PaymentMode: 'Bank' })} checked={invoiceData.PaymentMode == 'Bank'} className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" />
                                 <label className="form-check-label" >
                                   Bank Transfer
                                 </label>
                               </div>
                               <div className="form-check">
-                                <input disabled={disable} className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" />
+                                <input disabled={disable} onChange={(event) => setInvoiceData({ ...invoiceData, PaymentMode: 'Other' })} checked={invoiceData.PaymentMode == 'Other'} className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" />
                                 <label className="form-check-label" >
                                   Other
                                 </label>
@@ -825,7 +972,8 @@ const BuyerModule = ({ salesmanCode }) => {
                                   disabled={disable}
                                   className="form-control"
                                   placeholder="Enter Notes"
-                                  defaultValue={""}
+                                  value={invoiceData.Notes}
+                                  onChange={(e) => setInvoiceData({ ...invoiceData, Notes: e.target.value })}
                                 />
                               </div>
                             </div>
@@ -863,16 +1011,8 @@ const BuyerModule = ({ salesmanCode }) => {
                                     type="text"
                                     className="form-control"
                                     placeholder={10}
-                                  />
-                                </div>
-                              </div>
-                              <div className="col-lg-4 col-md-12">
-                                <div className="form-group">
-                                  <label>Total discount</label>
-                                  <input
-                                    type="text"
-                                    className="bg-white-smoke form-control"
-                                    placeholder="13.2"
+                                    value={manualdiscount}
+                                    onChange={e => setmanualdiscount(e.target.value)}
                                   />
                                 </div>
                               </div>
@@ -880,26 +1020,23 @@ const BuyerModule = ({ salesmanCode }) => {
                             <div className="invoice-total-box">
                               <div className="invoice-total-inner">
                                 <p>
-                                  CGST({gstEntries[0]?.value}%) <span>₹120.00</span>
+                                  CGST({gstEntries.CGST}%) <span>₹{CGSTTax}</span>
                                 </p>
                                 <p>
-                                  SGST({gstEntries[1]?.value}%) <span>₹120.00</span>
+                                  SGST({gstEntries.SGST}%) <span>₹{SGSTTax}</span>
                                 </p>
-                                <p>
-                                  Discount <span>₹13.20</span>
-                                </p>
-
-                                {/* <p>
-                                  Vat <span>₹0.00</span>
-                                </p> */}
                                 <div className="status-toggle justify-content-between">
                                   <div className="d-flex align-center">
                                     <p>Round Off </p>
                                     <input
+                                      checked={isroundoff}
                                       id="rating_1"
                                       className="check"
                                       type="checkbox"
-                                      defaultChecked="true"
+                                      onChange={val => {
+                                        setisroundoff(val.target.checked);
+
+                                      }}
                                     />
                                     <label
                                       htmlFor="rating_1"
@@ -908,42 +1045,18 @@ const BuyerModule = ({ salesmanCode }) => {
                                       checkbox
                                     </label>
                                   </div>
-                                  <span>₹0.00</span>
+                                  <span>₹{roundoff}</span>
                                 </div>
                               </div>
+                              <p>
+                                Discount <span>₹{discount}</span>
+                              </p>
                               <div className="invoice-total-footer">
                                 <h4>
-                                  Total Amount <span>₹107.80</span>
+                                  Total Amount <span>{total}</span>
                                 </h4>
                               </div>
                             </div>
-                            {/* <div className="form-group">
-                              <label>Signature Name</label>
-                              <input
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter Signature Name"
-                              />
-                            </div> */}
-                            {/* <div className="form-group mb-0">
-                              <label>Signature Image</label>
-                              <div className="form-group service-upload service-upload-info mb-0">
-                                <span>
-                                  <i className="fe fe-upload-cloud me-1" />
-                                  <FeatherIcon
-                                    icon="upload-cloud"
-                                    className="me-1"
-                                  />
-                                  Upload Signature
-                                </span>
-                                <input
-                                  type="file"
-                                  multiple=""
-                                  id="image_sign"
-                                />
-                                <div id="frames" />
-                              </div>
-                            </div> */}
                           </div>
                         </div>
                       </div>
@@ -958,6 +1071,7 @@ const BuyerModule = ({ salesmanCode }) => {
                       <button onClick={() => {
                         setDisable(true)
                         navigate('/invoice', { state: { invoiceData } })
+                        getEinvoice()
                       }} type="submit" className="btn btn-primary">
                         Save Changes
                       </button>
@@ -969,161 +1083,10 @@ const BuyerModule = ({ salesmanCode }) => {
           </div>
         </div>
 
-        {/* Add Tax & Discount Modal */}
-        <div
-          className="modal custom-modal fade"
-          id="add_discount"
-          role="dialog"
-        >
-          <div className="modal-dialog modal-dialog-centered modal-md w-[750%]">
-            <div className="modal-content">
-              <div className="modal-header border-0 pb-0 w-full">
-                <div className="form-header modal-header-title text-start mb-0 align-center">
-                  <h4 className="mb-0">{
-                    editMode ? 'Edit Product' : 'Add Product'
-                  }</h4>
-                </div>
-                <button
-                  type="button"
-                  className="close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span className="align-center" aria-hidden="true">
-                    ×
-                  </span>
-                </button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>Product</label>
-                      <input
-                        ref={productRef}
-                        type="text"
-                        className="form-control"
-                        placeholder={120}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>Type</label>
-                      <Select2
-                        onChange={handleTypeChange}
-                        className="form-control w-100"
-                        data={purityChoices}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>Purity</label>
-                      <input
-                        ref={purityRef}
-                        type="text"
-                        className="form-control"
-                        placeholder={0}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>Rate</label>
-                      <input
-                        ref={rateRef}
-                        type="text"
-                        className="form-control"
-                        placeholder={0}
-                      />
-                    </div>
-                  </div>
+        {Loading && <div style={{ backgroundColor: 'rgba(0,0,0,0.3)', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 999 }}>
 
-                </div>
-                <div className='row'>
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>Description</label>
-                      <input
-                        ref={descRef}
-                        type="text"
-                        className="form-control"
-                        placeholder={0}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>Number of Pieces(Pcs.)</label>
-                      <input
-                        ref={pcsRef}
-                        type="text"
-                        className="form-control"
-                        placeholder={0}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>Amount</label>
-                      <input
-                        type="text"
-                        ref={amountRef}
-                        className="form-control"
-                        placeholder={0}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group">
-                      <label>Making Charges</label>
-                      <input
-                        ref={makingChargesRef}
-                        type="text"
-                        className="form-control"
-                        placeholder={0}
-                      />
-                    </div>
-                  </div>
-
-
-                  <div className="col-lg-6 col-md-12">
-                    <div className="form-group mb-0">
-                      <label>Tax</label>
-                      <Select2
-                        className="w-100 form-control"
-                        data={tax}
-                        options={{
-                          placeholder: "Choose Customer",
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="modal-footer add-tax-btns">
-                <button
-                  type="reset"
-                  data-bs-dismiss="modal"
-                  className="btn btn-primary paid-cancel-btn me-2"
-                >
-                  Cancel
-                </button>
-                {/* <button
-                type="submit"
-                  data-bs-dismiss="modal"
-                  className="btn btn-primary"
-                >
-                  Save
-                </button> */}
-                <button onClick={AddItemToTable} className="btn btn-primary">Save</button>
-              </div>
-            </div>
-          </div>
         </div>
-        {/* /Add Tax & Discount Modal */}
-
+        }
         {/* Delete Items Modal */}
         <div
           className="modal custom-modal fade"
@@ -1167,101 +1130,7 @@ const BuyerModule = ({ salesmanCode }) => {
         </div>
         {/* /Delete Items Modal */}
 
-        {/* Add Bank Details Modal */}
-        <div
-          className="modal custom-modal fade"
-          id="bank_details"
-          role="dialog"
-        >
-          <div className="modal-dialog modal-dialog-centered modal-md">
-            <div className="modal-content">
-              <div className="modal-header border-0 pb-0">
-                <div className="form-header modal-header-title text-start mb-0">
-                  <h4 className="mb-0">Add Bank Details</h4>
-                </div>
-                <button
-                  type="button"
-                  className="close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span className="align-center" aria-hidden="true">
-                    ×
-                  </span>
-                </button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="col-lg-12 col-md-12">
-                    <div className="form-group">
-                      <label>
-                        Bank Name <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter Bank Name"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-12 col-md-12">
-                    <div className="form-group">
-                      <label>
-                        Account Number <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        placeholder="Enter Account Number"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-12 col-md-12">
-                    <div className="form-group">
-                      <label>
-                        Branch Name <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter Branch Name"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-12 col-md-12">
-                    <div className="form-group mb-0">
-                      <label>
-                        IFSC Code <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        placeholder="Enter IFSC COde"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <Link
-                  to="#"
-                  data-bs-dismiss="modal"
-                  className="btn btn-primary paid-cancel-btn me-2"
-                >
-                  Back
-                </Link>
-                <Link
-                  to="#"
-                  data-bs-dismiss="modal"
-                  className="btn btn-primary paid-continue-btn"
-                >
-                  Save
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* /Add Bank Details Modal */}
+
       </div>
     </>
   );

@@ -6,7 +6,7 @@ import FeatherIcon from "feather-icons-react";
 // import Data from "../assets/jsons/productList";
 import "../../components/antd.css";
 import { Table } from "antd";
-// import Select2 from '../components/SelectDropdown'
+import Select2 from '../../components/SelectDropdown'
 import * as bootstrap from 'bootstrap'
 // import {
 //     onShowSizeChange,
@@ -17,9 +17,13 @@ import * as bootstrap from 'bootstrap'
 
 const HMCharge = () => {
     const [menu, setMenu] = useState(false);
+    const [OrnamentType, setOrnamentType] = useState([]);
+
     const [item, setitem] = useState(null);
     const [selectedItem, setselectedItem] = useState(null);
     const [toBeDeleteItem, setToBeDeleteItem] = useState(null);
+    const [newProduct, setnewProduct] = useState({ id: null, item: '', om_type: '', om_id: '' });
+
     // const [show, setShow] = useState(false);
     // const [confirmDelete, setConfirmDelete] = useState(false)
     const [datasource, setdatasource] = useState([]);
@@ -47,6 +51,26 @@ const HMCharge = () => {
                 console.log('Error')
             },
         });
+        $.ajax({
+            url: 'http://localhost:80/billing_api/index.php',
+            type: "POST",
+            data: {
+                method: "getOrnamentType",
+            },
+            success: function (dataClient) {
+                try {
+                    setOrnamentType(JSON.parse(dataClient))
+                } catch (e) {
+                    // setdatasource([])
+                    setOrnamentType([])
+                    console.log(e)
+                }
+                // console.log(dataClient);
+            },
+            error: function (request, error) {
+                console.log('Error')
+            },
+        });
     }
 
 
@@ -61,8 +85,14 @@ const HMCharge = () => {
             dataIndex: "id",
             sorter: (a, b) => a.id.length - b.id.length,
         },
+
         {
-            title: "Item",
+            title: "Ornament Type",
+            dataIndex: "om_type",
+            sorter: (a, b) => a.item.length - b.item.length,
+        },
+        {
+            title: "HM Charge",
             dataIndex: "item",
             sorter: (a, b) => a.item.length - b.item.length,
         },
@@ -117,19 +147,12 @@ const HMCharge = () => {
                 type: "POST",
                 data: {
                     method: "updateHmCharge",
-                    data: JSON.stringify({ id: parseInt(selectedItem.id), item: item }),
+                    data: JSON.stringify({ ...newProduct, id: parseInt(newProduct.id) }),
                 },
                 success: function (dataClient) {
-                    var editValue = datasource.filter(val => {
-                        if (val.id === selectedItem.id) {
-                            val.item = item
-                        }
-                        return val
-                    });
-
-                    setdatasource([...editValue]);
+                    refreshData();
                     console.log(dataClient);
-                    setitem('');
+                    setnewProduct({ id: null, item: '', otid: '', ottitle: '', suffix: '' })
                     setselectedItem(null)
                 },
                 error: function (request, error) {
@@ -147,7 +170,7 @@ const HMCharge = () => {
                 type: "POST",
                 data: {
                     method: "insertHmCharge",
-                    data: JSON.stringify({ item: item }),
+                    data: JSON.stringify(newProduct),
                 },
                 success: function (dataClient) {
                     console.log(dataClient);
@@ -165,6 +188,7 @@ const HMCharge = () => {
 
 
     const showEditModel = (record) => {
+        setnewProduct(record)
         setselectedItem(record)
         setitem(record.desc)
         var myModal = new bootstrap.Modal(document.getElementById('edit_inventory'));
@@ -322,21 +346,36 @@ const HMCharge = () => {
                                 <div className="row">
                                     <div className="col-lg-12">
                                         <div className="form-group mb-0">
-                                            {/* <label>Ornament Desc</label> */}
+                                            <label>Ornament Type</label>
+                                            <Select2
+                                                value={newProduct.om_type}
+                                                onChange={(e) => {
+                                                    setnewProduct({ ...newProduct, om_type: OrnamentType[e.target.selectedIndex].item, om_id: OrnamentType[e.target.selectedIndex].id });
+                                                    console.log({ ...newProduct })
+                                                }}
+                                                type="text"
+                                                data={OrnamentType}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-12" style={{ marginTop: 10 }}>
+                                        <div className="form-group mb-0">
+                                            <label>HM Charge</label>
                                             <input
                                                 // ref={OrnamentDescRef}
                                                 type="text"
                                                 className="form-control"
                                                 style={{ width: '100%' }}
-                                                value={item}
+                                                value={newProduct.item}
                                                 onChange={(text) => {
-                                                    setitem(text.target.value)
+                                                    setnewProduct({ ...newProduct, item: text.target.value });
+                                                    console.log({ ...newProduct })
                                                 }}
                                             // defaultValue="Stock in"
                                             />
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                             <div className="modal-footer">

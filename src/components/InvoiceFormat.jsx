@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
 const InvoiceFormat = () => {
 
     const location = useLocation()
-    const data = location.state.invoiceData;
+    const data = { items: [] };
     console.log(data)
     return (
         <>

@@ -8,6 +8,7 @@ import "../../components/antd.css";
 import { Table } from "antd";
 import * as bootstrap from 'bootstrap'
 // import Select2 from '../components/SelectDropdown'
+import $ from 'jquery'
 
 // import {
 //     onShowSizeChange,
@@ -19,6 +20,7 @@ import * as bootstrap from 'bootstrap'
 const OrnamentType = () => {
     const [menu, setMenu] = useState(false);
     const [item, setitem] = useState(null);
+    const [suffix, setsuffix] = useState(null);
     const [selectedItem, setselectedItem] = useState(null);
     const [toBeDeleteItem, setToBeDeleteItem] = useState(null);
     // const [show, setShow] = useState(false);
@@ -63,8 +65,13 @@ const OrnamentType = () => {
             sorter: (a, b) => a.id.length - b.id.length,
         },
         {
-            title: "Item",
+            title: "Ornament Name",
             dataIndex: "item",
+            sorter: (a, b) => a.item.length - b.item.length,
+        },
+        {
+            title: "Suffix",
+            dataIndex: "suffix",
             sorter: (a, b) => a.item.length - b.item.length,
         },
         {
@@ -79,7 +86,7 @@ const OrnamentType = () => {
                             className="btn btn-primary gap-2">
                             Edit
                         </button>
-                        {
+                        {/* {
                             (record.item === toBeDeleteItem) ?
                                 <>
                                     <button onClick={() => deleteItem(record)} className="btn btn-primary ms-1 me-2">confirm</button>
@@ -102,7 +109,7 @@ const OrnamentType = () => {
                                     className="btn btn-danger gap-2">
                                     Delete
                                 </button>
-                        }
+                        } */}
                     </div>
                 </>
             )
@@ -110,7 +117,7 @@ const OrnamentType = () => {
     ];
 
 
-   const handleAddItem = () => {
+    const handleAddItem = () => {
         if (selectedItem) {
 
             $.ajax({
@@ -118,12 +125,13 @@ const OrnamentType = () => {
                 type: "POST",
                 data: {
                     method: "updateOrnamentType",
-                    data: JSON.stringify({ id: parseInt(selectedItem.id), item: item }),
+                    data: JSON.stringify({ id: parseInt(selectedItem.id), item: item, suffix: suffix }),
                 },
                 success: function (dataClient) {
                     var editValue = datasource.filter(val => {
                         if (val.id === selectedItem.id) {
                             val.item = item
+                            val.suffix = suffix
                         }
                         return val
                     });
@@ -131,6 +139,7 @@ const OrnamentType = () => {
                     setdatasource([...editValue]);
                     console.log(dataClient);
                     setitem('');
+                    setsuffix('');
                     setselectedItem(null)
                 },
                 error: function (request, error) {
@@ -148,7 +157,7 @@ const OrnamentType = () => {
                 type: "POST",
                 data: {
                     method: "insertOrnamentType",
-                    data: JSON.stringify({ item: item }),
+                    data: JSON.stringify({ item: item, suffix: suffix }),
                 },
                 success: function (dataClient) {
                     console.log(dataClient);
@@ -158,7 +167,9 @@ const OrnamentType = () => {
                     console.log('Error')
                 },
             });
-            setitem('')
+            setitem('');
+            setsuffix('');
+
         }
     }
 
@@ -166,8 +177,10 @@ const OrnamentType = () => {
 
 
     const showEditModel = (record) => {
+        console.log(record);
+        setitem(record.item)
+        setsuffix(record.suffix)
         setselectedItem(record)
-        setitem(record.desc)
         var myModal = new bootstrap.Modal(document.getElementById('edit_inventory'));
         myModal.show()
     }
@@ -333,7 +346,19 @@ const OrnamentType = () => {
                                                 onChange={(text) => {
                                                     setitem(text.target.value)
                                                 }}
+                                                placeholder="Ornament Name"
                                             // defaultValue="Stock in"
+                                            />
+                                            <input
+                                                // ref={OrnamentDescRef}
+                                                type="text"
+                                                className="form-control"
+                                                style={{ width: '100%', marginTop: 20 }}
+                                                placeholder="Suffix"
+                                                value={suffix}
+                                                onChange={(text) => {
+                                                    setsuffix(text.target.value)
+                                                }}
                                             />
                                         </div>
                                     </div>

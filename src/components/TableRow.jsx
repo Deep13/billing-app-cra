@@ -1,44 +1,13 @@
 import React from 'react'
-
+import $ from 'jquery'
 const TableRow = ({
-    product,
-    desc,
-    pcs,
-    gross,
-    stWt = 2,
-    stVal = 2000,
-    fixed_charges = 5000,
-    hsn = '01a2e',
-    net,
-    amount,
-    making_charges,
+    tableData,
     handleOnEnterAnyData,
-    // getStockData,
+    getStockData
 }) => {
 
 
-    const getStockData = (huid) => {
-        debugger;
-        $.ajax({
-            url: 'http://localhost:80/billing_api/index.php',
-            type: "POST",
-            data: {
-                method: "getStockByHuid",
-                data: JSON.stringify({ huid: huid }),
-            },
-            success: function (dataClient) {
-                try {
-                    console.log(JSON.parse(dataClient));
-                } catch (e) {
-                    console.log(e)
-                }
-                // setPurityChoices(JSON.parse(dataClient))
-            },
-            error: function (request, error) {
-                console.log('Error')
-            }
-        });
-    }
+
 
 
 
@@ -47,39 +16,56 @@ const TableRow = ({
             <td>
                 <input onKeyUp={(e) => {
                     if (e.key === 'Enter') {
-                        getStockData('10024')
+                        getStockData(e.target.value)
                     }
-                }} className='form-control text-sm' placeholder={product} onChange={handleOnEnterAnyData} type="text" />
+                }} className='form-control text-sm'
+                    value={tableData.huid} type="text" />
             </td>
             <td>
-                <input className='form-control p-2' placeholder={desc} onChange={handleOnEnterAnyData} type="text" />
+                <input className='form-control p-2'
+                    value={tableData.orm_desc}
+                    onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
-                <input className='form-control' placeholder={pcs} onChange={handleOnEnterAnyData} type="text" />
+                <input className='form-control'
+                    value={tableData.quantity}
+                    onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
-                <input className='form-control' placeholder={gross} onChange={handleOnEnterAnyData} type="text" />
+                <input className='form-control'
+                    value={tableData.gross_wt}
+                    onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
-                <input className='form-control' placeholder={net} onChange={handleOnEnterAnyData} type="text" />
+                <input className='form-control'
+                    value={tableData.net_wt}
+                    onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
-                <input className='form-control' placeholder={amount} onChange={handleOnEnterAnyData} type="text" />
+                <input className='form-control'
+                    value={tableData.net_wt}
+                    onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
-                <input className='form-control' placeholder={stWt} onChange={handleOnEnterAnyData} type="text" />
+                <input className='form-control'
+                    onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
-                <input className='form-control' placeholder={stVal} onChange={handleOnEnterAnyData} type="text" />
+                <input className='form-control'
+                    value={tableData.stone_wt}
+                    onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
-                <input className='form-control' placeholder={hsn} onChange={handleOnEnterAnyData} type="text" />
+                <input className='form-control'
+                    onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
-                <input className='form-control' placeholder={making_charges} onChange={handleOnEnterAnyData} type="text" />
+                <input className='form-control'
+                    onChange={handleOnEnterAnyData} type="text" />
             </td>
             <td>
-                <input className='form-control' placeholder={making_charges} onChange={handleOnEnterAnyData} type="text" />
+                <input className='form-control'
+                    onChange={handleOnEnterAnyData} type="text" />
             </td>
         </>
     )

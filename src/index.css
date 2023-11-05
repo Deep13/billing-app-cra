@@ -14,3 +14,11 @@ input {
     display: none;
   }
 }
+
+.card-table .card-body .table th {
+  padding: 5px !important;
+}
+
+.card-table .card-body .table td {
+  padding: 5px !important;
+}

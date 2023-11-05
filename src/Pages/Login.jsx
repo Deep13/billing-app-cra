@@ -5,6 +5,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { alphaNumericPattern, emailrgx } from '../assets/constant'
+import $ from 'jquery'
 
 const schema = yup
     .object({
@@ -46,7 +47,7 @@ const Login = ({ setSalesmanCode }) => {
 
     const authenticateUser = (data) => {
         const { email, password } = data;
-        // console.log(data)
+        console.log(data);
         $.ajax({
             url: 'http://localhost:80/billing_api/users.php',
             type: "POST",
@@ -61,9 +62,13 @@ const Login = ({ setSalesmanCode }) => {
                     let thisData = JSON.parse(dataClient)
                     if (thisData.prompt === 'Authentication successful') {
                         navigate('/master-data')
-                        setSalesmanCode(thisData.id)
-                    } else if (dataClient === 'Authentication failed') {
+                        localStorage.setItem("logid", JSON.stringify(thisData));
+                        // setSalesmanCode(thisData.id)
+                    } else if (thisData.prompt === 'Authentication failed') {
                         alert('Invalid credentials')
+                    }
+                    else {
+                        alert(thisData.prompt)
                     }
                 } catch (e) {
                     console.log(e)
@@ -142,7 +147,7 @@ const Login = ({ setSalesmanCode }) => {
 
                                                 <small>{errors?.password?.message}</small>
                                             </div>
-                                            <div className="form-group">
+                                            {/* <div className="form-group">
                                                 <div className="row">
                                                     <div className="col-6">
                                                         <div className="custom-control custom-checkbox">
@@ -160,7 +165,7 @@ const Login = ({ setSalesmanCode }) => {
                                                         <Link className="forgot-link" to="/forgot-password"> Forgot Password ? </Link>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> */}
                                             <button
                                                 className="btn btn-lg btn-block w-100 btn-primary w-100"
                                                 type="submit"
@@ -168,12 +173,12 @@ const Login = ({ setSalesmanCode }) => {
                                                 Login
                                             </button>
                                         </form>
-                                        <div className="login-or">
+                                        {/* <div className="login-or">
                                             <span className="or-line" />
                                             <span className="span-or">or</span>
-                                        </div>
+                                        </div> */}
                                         {/* Social Login */}
-                                        <div className="social-login mb-3">
+                                        {/* <div className="social-login mb-3">
                                             <span>Login with</span>
                                             <Link to="#" className="facebook">
                                                 <i className="fab fa-facebook-f" />
@@ -181,19 +186,19 @@ const Login = ({ setSalesmanCode }) => {
                                             <Link to="#" className="google">
                                                 <i className="fab fa-google" />
                                             </Link>
-                                        </div>
+                                        </div> */}
                                         {/* /Social Login */}
-                                        <div className="text-center dont-have">
+                                        {/* <div className="text-center dont-have">
                                             Dont have an account yet?
-                                            <Link to="/signup">Register</Link>
-                                        </div>
+                                            <Link to="/signup">Register</Link> */}
+                                        {/* </div> */}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
 
         </>
     );

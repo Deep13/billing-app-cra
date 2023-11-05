@@ -6,7 +6,7 @@ import FeatherIcon from "feather-icons-react";
 // import Data from "../assets/jsons/productList";
 import "../components/antd.css";
 import { Table } from "antd";
-// import Select2 from '../components/SelectDropdown'
+import Select2 from '../components/SelectDropdown'
 import * as bootstrap from 'bootstrap'
 
 // import {
@@ -24,6 +24,9 @@ const MasterData = () => {
     // const [show, setShow] = useState(false);
     // const [confirmDelete, setConfirmDelete] = useState(false)
     const [datasource, setdatasource] = useState([]);
+    const [OrnamentType, setOrnamentType] = useState([]);
+    const [newProduct, setnewProduct] = useState({ id: null, item: '', otid: '', ottitle: '', suffix: '' });
+
     useEffect(() => {
         refreshData();
     }, [])
@@ -36,12 +39,37 @@ const MasterData = () => {
                 method: "getOrnament",
             },
             success: function (dataClient) {
-                setdatasource(JSON.parse(dataClient));
-                console.log(JSON.parse(dataClient));
+                try {
+                    setdatasource(JSON.parse(dataClient));
+                    console.log(JSON.parse(dataClient));
+                }
+                catch (e) {
+                    setdatasource([])
+                }
             },
             error: function (request, error) {
                 console.log('Error')
             }
+        });
+        $.ajax({
+            url: 'http://localhost:80/billing_api/index.php',
+            type: "POST",
+            data: {
+                method: "getOrnamentType",
+            },
+            success: function (dataClient) {
+                try {
+                    setOrnamentType(JSON.parse(dataClient))
+                } catch (e) {
+                    // setdatasource([])
+                    setOrnamentType([])
+                    console.log(e)
+                }
+                // console.log(dataClient);
+            },
+            error: function (request, error) {
+                console.log('Error')
+            },
         });
     }
 
@@ -63,6 +91,16 @@ const MasterData = () => {
             sorter: (a, b) => a.item.length - b.item.length,
         },
         {
+            title: "Suffix",
+            dataIndex: "suffix",
+            sorter: (a, b) => a.item.length - b.item.length,
+        },
+        {
+            title: "Om Type",
+            dataIndex: "ottitle",
+            sorter: (a, b) => a.item.length - b.item.length,
+        },
+        {
             title: "Action",
             dataIndex: "Action",
             render: (text, record) => (
@@ -74,7 +112,7 @@ const MasterData = () => {
                             className="btn btn-primary gap-2">
                             Edit
                         </button>
-                        {
+                        {/* {
                             (record.item === toBeDeleteItem) ?
                                 <>
                                     <button onClick={() => deleteItem(record)} className="btn btn-primary ms-1 me-2">confirm</button>
@@ -97,7 +135,7 @@ const MasterData = () => {
                                     className="btn btn-danger gap-2">
                                     Delete
                                 </button>
-                        }
+                        } */}
                     </div>
                 </>
             )
@@ -113,19 +151,12 @@ const MasterData = () => {
                 type: "POST",
                 data: {
                     method: "updateOrnament",
-                    data: JSON.stringify({ id: parseInt(selectedItem.id), item: item }),
+                    data: JSON.stringify({ ...newProduct, id: parseInt(newProduct.id) }),
                 },
                 success: function (dataClient) {
-                    var editValue = datasource.filter(val => {
-                        if (val.id === selectedItem.id) {
-                            val.item = item
-                        }
-                        return val
-                    });
-
-                    setdatasource([...editValue]);
+                    refreshData();
                     console.log(dataClient);
-                    setitem('');
+                    setnewProduct({ id: null, item: '', otid: '', ottitle: '', suffix: '' })
                     setselectedItem(null)
                 },
                 error: function (request, error) {
@@ -143,7 +174,7 @@ const MasterData = () => {
                 type: "POST",
                 data: {
                     method: "insertOrnament",
-                    data: JSON.stringify({ item: item }),
+                    data: JSON.stringify(newProduct),
                 },
                 success: function (dataClient) {
                     console.log(dataClient);
@@ -154,7 +185,7 @@ const MasterData = () => {
                 },
             });
         }
-        setitem('')
+
     }
 
 
@@ -181,7 +212,8 @@ const MasterData = () => {
 
 
     const showEditModel = (record) => {
-        setselectedItem(record)
+        setnewProduct({ ...record });
+        setselectedItem(record);
         setitem(record.desc)
         var myModal = new bootstrap.Modal(document.getElementById('edit_inventory'));
         myModal.show()
@@ -321,17 +353,50 @@ const MasterData = () => {
                             </div>
                             <div className="modal-body">
                                 <div className="row">
-                                    <div className="col-lg-12">
+                                    <div className="col-lg-6 col-md-12" style={{ marginBottom: 10 }}>
                                         <div className="form-group mb-0">
-                                            {/* <label>Ornament Desc</label> */}
+                                            <label>Ornament Type</label>
+                                            <Select2
+                                                value={newProduct.otid}
+                                                onChange={(e) => {
+                                                    setnewProduct({ ...newProduct, ottitle: OrnamentType[e.target.selectedIndex].item, otid: OrnamentType[e.target.selectedIndex].id });
+                                                    console.log({ ...newProduct })
+                                                }}
+                                                type="text"
+                                                data={OrnamentType}
+                                                className="form-control"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-6 col-md-12">
+                                        <div className="form-group mb-0">
+                                            <label>Suffix</label>
                                             <input
                                                 // ref={OrnamentDescRef}
                                                 type="text"
                                                 className="form-control"
                                                 style={{ width: '100%' }}
-                                                value={item}
+                                                value={newProduct.suffix}
                                                 onChange={(text) => {
-                                                    setitem(text.target.value)
+                                                    setnewProduct({ ...newProduct, suffix: text.target.value });
+                                                    console.log({ ...newProduct })
+                                                }}
+                                            // defaultValue="Stock in"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-12" style={{ marginTop: 10 }}>
+                                        <div className="form-group mb-0">
+                                            <label>Ornament Name</label>
+                                            <input
+                                                // ref={OrnamentDescRef}
+                                                type="text"
+                                                className="form-control"
+                                                style={{ width: '100%' }}
+                                                value={newProduct.item}
+                                                onChange={(text) => {
+                                                    setnewProduct({ ...newProduct, item: text.target.value });
+                                                    console.log({ ...newProduct })
                                                 }}
                                             // defaultValue="Stock in"
                                             />

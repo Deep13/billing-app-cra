@@ -235,8 +235,8 @@ const Customers = () => {
             url: 'http://localhost:80/billing_api/customers.php',
             type: "POST",
             data: {
-                method: "deleteStock",
-                data: JSON.stringify({ id: customer.id }),
+                method: "deleteCustomer",
+                data: JSON.stringify({ id: parseInt(customer.id) }),
             },
             success: function (dataClient) {
                 // setitem('')
