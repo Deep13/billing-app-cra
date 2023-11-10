@@ -6,8 +6,8 @@ import { useLocation } from "react-router-dom";
 const InvoiceFormat = () => {
 
     const location = useLocation()
-    const data = { items: [] };
-    console.log(data)
+    const data = { items: [], ...location.state.invoiceData };
+    console.log(location.state)
     return (
         <>
             <div className="main-wrapper p-8">

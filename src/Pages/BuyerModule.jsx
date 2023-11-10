@@ -11,9 +11,15 @@ import TableRow from "../components/TableRow";
 import InvoiceFormat from "../components/InvoiceFormat";
 // import Select2 from "react-select2-wrapper";
 import { Table } from "antd";
+import { ToastContainer, toast } from "react-toastify";
 
 import $ from 'jquery'
 const BuyerModule = () => {
+
+
+  // state for storing if the customer is already present
+  const [presence, setPresence] = useState('')
+
   const [menu, setMenu] = useState(false);
   const [HMCharge, setHMCharge] = useState(false);
   const [total, settotal] = useState(0);
@@ -172,6 +178,7 @@ const BuyerModule = () => {
     CGst: '5%',
     SGst: '5%',
     TotalAmount: '165000',
+    items: []
   })
 
   const [disable, setDisable] = useState(false)
@@ -515,6 +522,68 @@ const BuyerModule = () => {
     // reset values remember
   }
 
+  const searchCustomer = () => {
+    let res;
+    if (!invoiceData.GstNumber) {
+      alert('Enter the gst number first')
+      return
+    }
+    // otherwise
+    $.ajax({
+      url: 'http://localhost:80/billing_api/customers.php',
+      type: "POST",
+      data: {
+        method: "searchCustomer",
+        data: JSON.stringify({
+          gst_number: invoiceData.GstNumber
+        }),
+      },
+      success: function (dataClient) {
+        console.log(dataClient === 'Present');
+        if (dataClient === 'Absent') {
+          InsertCustomerToDB({
+            contact_number: invoiceData.ContactNumber,
+            address: invoiceData.Address,
+            name: invoiceData.CustomerName,
+            id_type: invoiceData.IdType,
+            id_value: invoiceData.CardNumber,
+            gst_number: invoiceData.GstNumber,
+            state: invoiceData.State,
+            pincode: invoiceData.CityPin
+          })
+        }
+      },
+      error: function (request, error) {
+        console.log('Error')
+      }
+    });
+    return res
+  }
+
+  // const insertCustomer = (newUserObject) => {
+  //   let condition = invoiceData.Address && invoiceData.CustomerName && invoiceData.ContactNumber && invoiceData.CityPin && invoiceData.State && invoiceData.IdType && invoiceData.CardNumber && invoiceData.GstNumber;
+  //   if (!condition) {
+  //     alert('Enter the relevant data fields for customer if new.')
+  //     return
+  //   }
+  //   $.ajax({
+  //     url: 'http://localhost:80/billing_api/index.php',
+  //     type: "POST",
+  //     data: {
+  //       method: "insertCustomer",
+  //       data: JSON.stringify(newUserObject),
+  //     },
+  //     success: function (dataClient) {
+  //       console.log(JSON.parse(dataClient));
+  //       setPurityChoices(JSON.parse(dataClient))
+  //     },
+  //     error: function (request, error) {
+  //       console.log('Error')
+  //     }
+  //   });
+
+  // }
+
   const refreshData = () => {
     $.ajax({
       url: 'http://localhost:80/billing_api/index.php',
@@ -683,6 +752,27 @@ const BuyerModule = () => {
       }
     });
   }
+
+  const InsertCustomerToDB = (newCustomer) => {
+    $.ajax({
+      url: 'http://localhost:80/billing_api/customers.php',
+      type: "POST",
+      data: {
+        method: "insertCustomer",
+        data: JSON.stringify(newCustomer),
+      },
+      success: function (dataClient) {
+        alert('customer saved to database')
+
+      },
+      error: function (request, error) {
+        console.log('Error')
+        console.log(error)
+      },
+    });
+  }
+
+
   const getCustomerByContact = (contact_number) => {
     if (contact_number) {
       $.ajax({
@@ -712,7 +802,7 @@ const BuyerModule = () => {
             }
           }
           catch (e) {
-
+            alert('Customer Not Found')
           }
         },
         error: function (request, error) {
@@ -732,10 +822,10 @@ const BuyerModule = () => {
   }, []);
 
 
-
   return (
     <>
       <div className={`main-wrapper ${menu ? "slide-nav" : ""}`}>
+        <ToastContainer />
         <Header onMenuClick={(value) => toggleMobileMenu()} />
         <Sidebar />
         {/* <!-- Page Wrapper --> */}
@@ -759,6 +849,8 @@ const BuyerModule = () => {
                           autoFocus
                           type="text"
                           className="form-control"
+                          value={invoiceData.ContactNumber}
+                          onChange={(e) => setInvoiceData(prev => ({ ...prev, ContactNumber: e.target.value }))}
                           placeholder="Your Phone Number"
                           onKeyUp={(e) => {
                             if (e.key === 'Enter') {
@@ -775,6 +867,7 @@ const BuyerModule = () => {
                               disabled={disable}
                               type="text"
                               value={invoiceData.CustomerName}
+                              onChange={(e) => setInvoiceData(prev => ({ ...prev, CustomerName: e.target.value }))}
                               className="form-control"
                               placeholder="Name"
                             />
@@ -787,6 +880,7 @@ const BuyerModule = () => {
                         <label>GST Number</label>
                         <input
                           value={invoiceData.GstNumber}
+                          onChange={(e) => setInvoiceData(prev => ({ ...prev, GstNumber: e.target.value }))}
                           disabled={disable}
                           type="text"
                           className="form-control"
@@ -798,6 +892,7 @@ const BuyerModule = () => {
                         <textarea
                           disabled={disable}
                           value={invoiceData.Address}
+                          onChange={(e) => setInvoiceData(prev => ({ ...prev, Address: e.target.value }))}
                           className="form-control"
                           placeholder="Enter Address"
                           defaultValue={""}
@@ -816,6 +911,7 @@ const BuyerModule = () => {
                         <br />
                         <input
                           value={invoiceData.CardNumber}
+                          onChange={(e) => setInvoiceData(prev => ({ ...prev, CardNumber: e.target.value }))}
                           disabled={disable}
                           className='form-control relative'
                           placeholder={`Enter your ${cardType} number here`}
@@ -835,6 +931,7 @@ const BuyerModule = () => {
                           {/* <label>City PIN</label> */}
                           <input
                             value={invoiceData.CityPin}
+                            onChange={(e) => setInvoiceData(prev => ({ ...prev, CityPin: e.target.value }))}
                             disabled={disable}
                             type="text"
                             className="form-control"
@@ -1072,6 +1169,7 @@ const BuyerModule = () => {
                         setDisable(true)
                         navigate('/invoice', { state: { invoiceData } })
                         getEinvoice()
+                        searchCustomer()
                       }} type="submit" className="btn btn-primary">
                         Save Changes
                       </button>

@@ -28,8 +28,8 @@ const Login = ({ setSalesmanCode }) => {
     const [passworderror, setPasswordError] = useState("");
     const [formgroup, setFormGroup] = useState("");
     const [inputValues, setInputValues] = useState({
-        email: "admin@dreamguys.co.in",
-        password: "123456",
+        email: "mohit160720",
+        password: "mohit160720",
     });
 
     const navigate = useNavigate()
