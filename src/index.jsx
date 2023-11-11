@@ -23,6 +23,6 @@ window.jQuery = jQuery;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <Router>
-    <App />,
-  </Router>
+    <App />
+  </Router>,
 )

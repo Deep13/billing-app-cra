@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
 const InvoiceFormat = () => {
 
     const location = useLocation()
-    const data = { items: [], ...location.state.invoiceData };
+    const data = { ...location.state.invoiceData };
     console.log(location.state)
     return (
         <>
@@ -99,17 +99,17 @@ const InvoiceFormat = () => {
                                             data.items.map((curr, index) => (
                                                 <tr>
                                                     <td>{index + 1}</td>
-                                                    <td className=""> {curr.product}</td>
-                                                    <td className=""> {curr.type}</td>
-                                                    <td className=""> {curr.purity}</td>
+                                                    <td className=""> {curr.orm_desc}</td>
+                                                    <td className=""> {data.type}</td>
+                                                    <td className=""> {data.purity}</td>
                                                     <td className="table-description text-center">
                                                         {curr.desc}
                                                     </td>
-                                                    <td className="text-center">{curr.pcs}</td>
-                                                    <td className="text-center">{curr.gross}</td>
-                                                    <td className="text-center">{curr.net}</td>
-                                                    <td className="text-end">₹{curr.rate}</td>
-                                                    <td className="text-end">₹{curr.making_charges}</td>
+                                                    <td className="text-center">{curr.qty}</td>
+                                                    <td className="text-center">{curr.gross_wt}</td>
+                                                    <td className="text-center">{curr.net_wt}</td>
+                                                    <td className="text-end">₹{curr.amount}</td>
+                                                    <td className="text-end">₹{curr.making}</td>
                                                 </tr>
                                             ))
                                         }

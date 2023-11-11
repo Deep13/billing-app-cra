@@ -43,7 +43,7 @@ const BuyerModule = () => {
       render: (text, data, index) =>
         <input
           onKeyDown={(e) => {
-            if (e.key == 'Enter') {
+            if (e.key === 'Enter') {
               getStockData(e.target.value, index);
             }
             // 
@@ -60,40 +60,70 @@ const BuyerModule = () => {
       title: "Description",
       dataIndex: "orm_desc",
       sorter: (a, b) => a.item.length - b.item.length,
-      render: (text) =>
+      render: (text, data, index) =>
         <input
-          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].orm_desc = e.target.value;
+            setTableItems([...temp])
+          }}
+          //  value={text}
+          type="text" />
     },
     {
       title: "Pcs",
       dataIndex: "qty",
       sorter: (a, b) => a.item.length - b.item.length,
-      render: (text) =>
+      render: (text, data, index) =>
         <input
-          onChange={(e, a, b) => console.log(e.target.value, a, b)} value={text} type="text" />
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].qty = e.target.value;
+            setTableItems([...temp])
+          }}
+          // value={text}
+          type="text" />
     },
     {
       title: "Gross",
       dataIndex: "gross_wt",
       sorter: (a, b) => a.item.length - b.item.length,
-      render: (text) =>
+      render: (text, data, index) =>
         <input
-          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].gross_wt = e.target.value;
+            setTableItems([...temp])
+          }}
+          // value={text}
+          type="text" />
     },
     {
       title: "Net",
       dataIndex: "net_wt",
       sorter: (a, b) => a.item.length - b.item.length,
-      render: (text) =>
+      render: (text, data, index) =>
         <input
-          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].net_wt = e.target.value;
+            setTableItems([...temp])
+          }}
+          //  value={text} 
+          type="text" />
     }, {
       title: "Value",
       dataIndex: "value",
       sorter: (a, b) => a.item.length - b.item.length,
-      render: (text) =>
+      render: (text, data, index) =>
         <input
-          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].value = e.target.value;
+            setTableItems([...temp])
+          }}
+          // value={text}
+          type="text" />
     }, {
       title: "Making",
       dataIndex: "making",
@@ -111,21 +141,35 @@ const BuyerModule = () => {
 
             temp[index].amount = (parseFloat(temp[index].net_wt) * parseFloat(invoiceData.rate ? invoiceData.rate : 1)) + parseFloat(temp[index].hmcharge) + parseFloat(hmVal);
             setTableItems([...temp])
-          }} value={text} type="text" />
+          }}
+          //  value={text}
+          type="text" />
     }, {
       title: "St. Wt",
       dataIndex: "stone_wt",
       sorter: (a, b) => a.item.length - b.item.length,
-      render: (text) =>
+      render: (text, data, index) =>
         <input
-          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].stone_wt = e.target.value;
+            setTableItems([...temp])
+          }}
+          //  value={text}
+          type="text" />
     }, {
       title: "St. Val",
       dataIndex: "suffix",
       sorter: (a, b) => a.item.length - b.item.length,
-      render: (text) =>
+      render: (text, data, index) =>
         <input
-          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].suffix = e.target.value;
+            setTableItems([...temp])
+          }}
+          // value={text} 
+          type="text" />
     }, {
       title: "HM Charge",
       dataIndex: "hmcharge",
@@ -143,23 +187,67 @@ const BuyerModule = () => {
 
             temp[index].amount = (parseFloat(temp[index].net_wt) * parseFloat(invoiceData.rate ? invoiceData.rate : 1)) + parseFloat(hmVal) + parseFloat(temp[index].making);
             setTableItems([...temp])
-          }} value={text} type="text" />
+          }}
+          // value={text} 
+          type="text" />
     }, {
       title: "Amount",
       dataIndex: "amount",
       sorter: (a, b) => a.item.length - b.item.length,
-      render: (text) =>
+      render: (text, data, index) =>
         <input
-          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].amount = e.target.value;
+            setTableItems([...temp])
+          }}
+          // value={text} 
+          type="text" />
     }, {
       title: "HUID",
       dataIndex: "huid",
       sorter: (a, b) => a.item.length - b.item.length,
-      render: (text) =>
+      render: (text, data, index) =>
         <input
-          onChange={(e) => console.log(e.target.value)} value={text} type="text" />
+          onChange={(e) => {
+            var temp = [...tableItems];
+            temp[index].huid = e.target.value;
+            setTableItems([...temp])
+          }}
+          // value={text}
+          type="text" />
     },
   ];
+
+  const [tableItems, setTableItems] = useState([{
+    orm_desc: "",
+    om_code: "",
+    gross_wt: "",
+    net_wt: "",
+    stone_wt: "",
+    st_value: "",
+    qty: "",
+    amount: "",
+    making: "",
+    value: "",
+    hmcharge: "",
+    huid: ""
+  }])
+
+  const [currentTableItem, setCurrentTableItem] = useState({
+    orm_desc: "",
+    om_code: "",
+    gross_wt: "",
+    net_wt: "",
+    stone_wt: "",
+    st_value: "",
+    qty: "",
+    amount: "",
+    making: "",
+    value: "",
+    hmcharge: "",
+    huid: ""
+  })
 
   const [invoiceData, setInvoiceData] = useState({
     ContactNumber: '',
@@ -178,7 +266,10 @@ const BuyerModule = () => {
     CGst: '5%',
     SGst: '5%',
     TotalAmount: '165000',
-    items: []
+    items: tableItems,
+    type: '',
+    purity: '',
+    // remaining purity and type cuz they are outside of the items.
   })
 
   const [disable, setDisable] = useState(false)
@@ -239,7 +330,7 @@ const BuyerModule = () => {
     amount: 0,
     making_chares: 0,
   })
-  const [tableItems, setTableItems] = useState([{ "id": "", "entry_date": "", "orm_desc": "", "om_code": "", "purity": "", "gross_wt": "", "net_wt": "", "stone_wt": "", "qty": "", "huid": "" }])
+
   const productRef = useRef()
   // const typeRef = useRef()
   const purityRef = useRef()
@@ -263,6 +354,7 @@ const BuyerModule = () => {
 
   const handleTypeChange = (e) => {
     // setTypeOption(e.target.value)
+
   }
 
   const handleOnEnterAnyTableData = () => {
@@ -560,29 +652,28 @@ const BuyerModule = () => {
     return res
   }
 
-  // const insertCustomer = (newUserObject) => {
-  //   let condition = invoiceData.Address && invoiceData.CustomerName && invoiceData.ContactNumber && invoiceData.CityPin && invoiceData.State && invoiceData.IdType && invoiceData.CardNumber && invoiceData.GstNumber;
-  //   if (!condition) {
-  //     alert('Enter the relevant data fields for customer if new.')
-  //     return
-  //   }
-  //   $.ajax({
-  //     url: 'http://localhost:80/billing_api/index.php',
-  //     type: "POST",
-  //     data: {
-  //       method: "insertCustomer",
-  //       data: JSON.stringify(newUserObject),
-  //     },
-  //     success: function (dataClient) {
-  //       console.log(JSON.parse(dataClient));
-  //       setPurityChoices(JSON.parse(dataClient))
-  //     },
-  //     error: function (request, error) {
-  //       console.log('Error')
-  //     }
-  //   });
+  const insertInvoice = (newInvoiceObject) => {
+    let condition = invoiceData.Address && invoiceData.CustomerName && invoiceData.ContactNumber && invoiceData.CityPin && invoiceData.State && invoiceData.IdType && invoiceData.CardNumber && invoiceData.GstNumber;
+    if (!condition) {
+      alert('Enter the relevant data fields for customer if new.')
+      return
+    }
+    $.ajax({
+      url: 'http://localhost:80/billing_api/invoice.php',
+      type: "POST",
+      data: {
+        method: "insertInvoice",
+        data: JSON.stringify(newInvoiceObject),
+      },
+      success: function (dataClient) {
+        console.log(dataClient);
+      },
+      error: function (request, error) {
+        console.log('Error')
+      }
+    });
 
-  // }
+  }
 
   const refreshData = () => {
     $.ajax({
@@ -773,6 +864,7 @@ const BuyerModule = () => {
   }
 
 
+
   const getCustomerByContact = (contact_number) => {
     if (contact_number) {
       $.ajax({
@@ -821,6 +913,8 @@ const BuyerModule = () => {
     elements.map((element) => element.classList.add("w-100"));
   }, []);
 
+  useEffect(() => console.log(tableItems), [tableItems])
+  useEffect(() => console.log(invoiceData), [invoiceData])
 
   return (
     <>
@@ -947,7 +1041,8 @@ const BuyerModule = () => {
                         <div className="form-group">
                           <label>Type</label>
                           <Select2
-                            onChange={handleTypeChange}
+                            onChange={(e) => setInvoiceData(prev => ({ ...prev, type: e.target.value }))}
+                            value={invoiceData.type}
                             className="form-control w-100"
                             data={ornamentTypes}
                           />
@@ -957,7 +1052,7 @@ const BuyerModule = () => {
                         <div className="form-group">
                           <label>purity</label>
                           <Select2
-                            onChange={handleTypeChange}
+                            onChange={(e) => setInvoiceData(prev => ({ ...prev, purity: e.target.value }))}
                             className="form-control w-100"
                             data={purityChoices}
                           />
@@ -1170,6 +1265,7 @@ const BuyerModule = () => {
                         navigate('/invoice', { state: { invoiceData } })
                         getEinvoice()
                         searchCustomer()
+                        insertInvoice(invoiceData)
                       }} type="submit" className="btn btn-primary">
                         Save Changes
                       </button>
