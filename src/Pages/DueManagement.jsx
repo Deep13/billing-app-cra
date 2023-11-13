@@ -15,43 +15,6 @@ const DueManagement = () => {
     setMenu(!menu);
   };
 
-  const [product, setProduct] = useState([
-    { id: 1, text: "Choose Customer" },
-    { id: 2, text: "Customer 1" },
-    { id: 3, text: "Customer 2" },
-    { id: 4, text: "Customer 3" },
-  ]);
-
-  const [productOption, setProductOption] = useState([
-    { id: 1, text: "Select Product" },
-    { id: 2, text: "Product 1" },
-    { id: 3, text: "Product 2" },
-    { id: 4, text: "Product 3" },
-  ]);
-
-  const [currency, setCurrency] = useState([
-    { id: 1, text: "Select Currency" },
-    { id: 2, text: "US dollar" },
-    { id: 3, text: "Euro" },
-    { id: 4, text: "Pound sterling" },
-    { id: 5, text: "Swiss franc" },
-  ]);
-
-  const [percentage, setPercentage] = useState([
-    { id: 1, text: "Percentage(%)" },
-    { id: 2, text: "0%" },
-    { id: 3, text: "5%" },
-    { id: 4, text: "10%" },
-    { id: 5, text: "15%" },
-  ]);
-
-  const [tax, setTax] = useState([
-    { id: 1, text: "N/A" },
-    { id: 2, text: "5%" },
-    { id: 3, text: "10%" },
-    { id: 4, text: "15%" },
-  ]);
-
   useEffect(() => {
     let elements = Array.from(
       document.getElementsByClassName("react-datepicker-wrapper")

@@ -15,57 +15,87 @@ const Orders = () => {
     const toggleMobileMenu = () => {
         setMenu(!menu);
     };
+    const state = [
+        { id: 4, item: 'Andhra Pradesh' },
+        { id: 5, item: 'Arunachal Pradesh' },
+        { id: 6, item: 'Assam' },
+        { id: 7, item: 'Bihar' },
+        { id: 8, item: 'Chhattisgarh' },
+        { id: 9, item: 'Goa' },
+        { id: 10, item: 'Gujarat' },
+        { id: 11, item: 'Haryana' },
+        { id: 12, item: 'Himachal Pradesh' },
+        { id: 13, item: 'Jharkhand' },
+        { id: 14, item: 'Karnataka' },
+        { id: 15, item: 'Kerala' },
+        { id: 16, item: 'Madhya Pradesh' },
+        { id: 17, item: 'Maharashtra' },
+        { id: 18, item: 'Manipur' },
+        { id: 19, item: 'Meghalaya' },
+        { id: 20, item: 'Mizoram' },
+        { id: 21, item: 'Nagaland' },
+        { id: 22, item: 'Odisha' },
+        { id: 23, item: 'Punjab' },
+        { id: 24, item: 'Rajasthan' },
+        { id: 25, item: 'Sikkim' },
+        { id: 26, item: 'Tamil Nadu' },
+        { id: 27, item: 'Telangana' },
+        { id: 28, item: 'Tripura' }
+    ];
+    const [invoiceData, setInvoiceData] = useState({
+        ContactNumber: '',
+        CustomerName: '',
+        IdType: '',
+        CardNumber: '',
+        Address: '',
+        DueDate: '',
+        State: '',
+        InovoiceDate: '',
+        GstNumber: '',
+        CityPin: '',
+        PaymentMode: 'Cash',
+        Notes: '',
+    })
+    const [cardType, setCardType] = useState('card')
 
-    const [product, setProduct] = useState([
-        { id: 1, text: "Choose Customer" },
-        { id: 2, text: "Customer 1" },
-        { id: 3, text: "Customer 2" },
-        { id: 4, text: "Customer 3" },
-    ]);
+    const getCustomerByContact = (contact_number) => {
+        if (contact_number) {
+            $.ajax({
+                url: 'http://localhost:80/billing_api/customers.php',
+                type: "POST",
+                data: {
+                    method: "getCustomerByContact",
+                    data: JSON.stringify({ contact_number: contact_number }),
+                },
+                success: function (dataClient) {
+                    try {
+                        let thisData = JSON.parse(dataClient)
+                        console.log(thisData);
+                        if (dataClient.includes('not found')) {
+                            alert('Customer not registered with Entered Contact number')
+                        } else {
+                            setInvoiceData({
+                                ...invoiceData,
+                                CustomerName: thisData.name,
+                                Address: thisData.address,
+                                State: thisData.state,
+                                GstNumber: thisData.gst_number,
+                                IdType: thisData.id_type,
+                                CardNumber: thisData.id_value,
+                                CityPin: thisData.pincode,
+                            })
+                        }
+                    }
+                    catch (e) {
 
-    const [state, setState] = useState([
-        { text: 'Andhra Pradesh' },
-        { text: 'Arunachal Pradesh' },
-        { text: 'Assam' },
-        { text: 'Bihar' },
-        { text: 'Chhattisgarh' },
-        { text: 'Goa' },
-        { text: 'Gujarat' },
-        { text: 'Haryana' },
-        { text: 'Himachal Pradesh' },
-        { text: 'Jharkhand' },
-        { text: 'Karnataka' },
-        { text: 'Kerala' },
-        { text: 'Madhya Pradesh' },
-        { text: 'Maharashtra' },
-        { text: 'Manipur' },
-        { text: 'Meghalaya' },
-        { text: 'Mizoram' },
-        { text: 'Nagaland' },
-        { text: 'Odisha' },
-        { text: 'Punjab' },
-        { text: 'Rajasthan' },
-        { text: 'Sikkim' },
-        { text: 'Tamil Nadu' },
-        { text: 'Telangana' },
-        { text: 'Tripura' },
-        { text: 'Uttar Pradesh' },
-        { text: 'Uttarakhand' },
-        { text: 'West Bengal' }
-    ])
-
-    const [jewelleryType, setJewelleryType] = useState([
-        { text: "Diamond Necklace" },
-        { text: "Gold Bracelet" },
-        { text: "Pearl Earrings" },
-        { text: "Silver Ring" },
-        { text: "Sapphire Pendant" },
-        { text: "Emerald Brooch" },
-        { text: "Ruby Anklet" },
-        { text: "Amethyst Tiara" },
-        { text: "Opal Cufflinks" },
-        { text: "Platinum Watch" },
-    ])
+                    }
+                },
+                error: function (request, error) {
+                    console.log('Error')
+                },
+            });
+        }
+    }
 
     const [tableItems, setTableItems] = useState([
         {
@@ -82,61 +112,7 @@ const Orders = () => {
         }
     ])
 
-
-
-    const [idType, setIdType] = useState([
-        { id: 1, text: "Aadhar Card" },
-        { id: 3, text: "PAN Card" },
-        { id: 2, text: "Driving License" },
-        { id: 4, text: "Voter Id" }
-    ])
-
-    const [productOption, setProductOption] = useState([
-        { id: 1, text: "Select Product" },
-        { id: 2, text: "Product 1" },
-        { id: 3, text: "Product 2" },
-        { id: 4, text: "Product 3" },
-    ]);
-
-    const [currency, setCurrency] = useState([
-        { id: 1, text: "Select Currency" },
-        { id: 2, text: "US dollar" },
-        { id: 3, text: "Euro" },
-        { id: 4, text: "Pound sterling" },
-        { id: 5, text: "Swiss franc" },
-    ]);
-
-    const [percentage, setPercentage] = useState([
-        { id: 1, text: "Percentage(%)" },
-        { id: 2, text: "0%" },
-        { id: 3, text: "5%" },
-        { id: 4, text: "10%" },
-        { id: 5, text: "15%" },
-    ]);
-
-    const [tax, setTax] = useState([
-        { id: 1, text: "N/A" },
-        { id: 2, text: "5%" },
-        { id: 3, text: "10%" },
-        { id: 4, text: "15%" },
-    ]);
-
-    const AddItemToTable = () => {
-        let item = {
-            product: 'Product1',
-            type: 'Gold',
-            purity: 54,
-            rate: 64000,
-            desc: 'very good',
-            pcs: 2,
-            gross: 153500,
-            net: 153600,
-            amount: 156000,
-            making_chares: 12000,
-        }
-        setTableItems(prev => [item, ...prev])
-
-    }
+    const [idChoices, setIdChoices] = useState([])
 
     useEffect(() => {
         let elements = Array.from(
@@ -155,8 +131,93 @@ const Orders = () => {
                     <div className="content container-fluid">
                         <div className="page-header">
                             <div className="content-page-header">
-                                <h5>Invoice Generation</h5>
+                                <h5>Order Management</h5>
                             </div>
+                        </div>
+                        <div style={{ flexDirection: 'row', flexWrap: 'wrap', display: 'flex', justifyContent: 'space-between' }}>
+                            <div className="form-group" style={{ width: '30%' }}>
+                                <label>Contact Number</label>
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Your Phone Number"
+                                    onKeyUp={(e) => {
+                                        if (e.key === 'Enter') {
+                                            getCustomerByContact(e.target.value)
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div className="form-group" style={{ width: '30%' }}>
+                                <label>Customer Name</label>
+                                <ul className="form-group">
+                                    <li>
+                                        <input
+                                            type="text"
+                                            value={invoiceData.CustomerName}
+                                            className="form-control"
+                                            placeholder="Name"
+                                        />
+                                    </li>
+                                    <li>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="form-group" style={{ width: '30%' }}>
+                                <label>GST Number</label>
+                                <input
+                                    value={invoiceData.GstNumber}
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Enter GST Number"
+                                />
+                            </div>
+                            <div className="form-group" style={{ width: '30%' }}>
+                                <label>Address</label>
+                                <textarea
+                                    value={invoiceData.Address}
+                                    className="form-control"
+                                    placeholder="Enter Address"
+                                    defaultValue={""}
+                                    rows={4}
+                                />
+                            </div>
+                            <div className="form-group" style={{ width: '30%' }}>
+                                <label>ID Type</label>
+                                <Select2
+                                    value={invoiceData.IdType}
+                                    onChange={(e) => { setInvoiceData({ ...invoiceData, IdType: e.target.value }) }}
+                                    className='form-control relative'
+                                    data={idChoices}
+                                />
+                                <br />
+                                <input
+                                    value={invoiceData.CardNumber}
+                                    className='form-control relative'
+                                    placeholder={`Enter your ${cardType} number here`}
+                                />
+                            </div>
+                            <div className="form-group" style={{ width: '30%' }}>
+                                <label>State</label>
+                                <Select2
+                                    value={invoiceData.State}
+                                    onChange={(e) => { setInvoiceData({ ...invoiceData, State: e.target.value }) }}
+                                    className='form-control relative'
+                                    data={state}
+                                />
+                                <br />
+                                <div className="form-group" >
+                                    {/* <label>City PIN</label> */}
+                                    <input
+                                        value={invoiceData.CityPin}
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="City PIN"
+                                    />
+                                </div>
+                            </div>
+
                         </div>
                         <div className="row">
                             <div className="col-md-12">
@@ -166,11 +227,11 @@ const Orders = () => {
                                             <div className="row align-item-center">
                                                 <div className="col-lg-4 col-md-6 col-sm-12">
                                                     <div className="form-group">
-                                                        <label>Contact Number</label>
+                                                        <label>Memo Number</label>
                                                         <input
                                                             type="text"
                                                             className="form-control"
-                                                            placeholder="Your Phone Number"
+                                                            placeholder="Enter First Name"
                                                         />
                                                     </div>
                                                 </div>
@@ -179,50 +240,21 @@ const Orders = () => {
                                                         <label>Customer Name</label>
                                                         <ul className="form-group-plus css-equal-heights">
                                                             <li>
-                                                                <input
-                                                                    type="text"
-                                                                    className="form-control"
-                                                                    placeholder="Name"
-                                                                />
                                                             </li>
                                                             <li>
-                                                                {/* <Link
-                                  className="btn btn-primary form-plus-btn"
-                                  to="/add-customer"
-                                >
-                                  <i className="fe fe-plus-circle" />
-                                  <FeatherIcon icon="plus-circle" />
-                                </Link> */}
+                                                                <Link
+                                                                    className="btn btn-primary form-plus-btn"
+                                                                    to="/add-customer"
+                                                                >
+                                                                    <FeatherIcon icon="plus-circle" />
+                                                                </Link>
                                                             </li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4 col-md-6 col-sm-12">
                                                     <div className="form-group">
-                                                        <label>Invoice Date</label>
-                                                        <div className="cal-icon cal-icon-info">
-                                                            <DatePicker
-                                                                className="datetimepicker form-control"
-                                                                selected={startDate}
-                                                                onChange={(date) => setStartDate(date)}
-                                                            ></DatePicker>
-                                                            {/* <FeatherIcon icon="calendar"/> */}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 col-md-6 col-sm-12">
-                                                    <div className="form-group notes-form-group-info">
-                                                        <label>Address</label>
-                                                        <textarea
-                                                            className="form-control"
-                                                            placeholder="Enter Address"
-                                                            defaultValue={""}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 col-md-6 col-sm-12">
-                                                    <div className="form-group">
-                                                        <label>Due Date</label>
+                                                        <label>Memo Date</label>
                                                         <div className="cal-icon cal-icon-info">
                                                             <DatePicker
                                                                 className="datetimepicker form-control"
@@ -231,187 +263,94 @@ const Orders = () => {
                                                             ></DatePicker>
                                                         </div>
                                                     </div>
+                                                </div>
 
-                                                </div>
                                                 <div className="col-lg-4 col-md-6 col-sm-12">
                                                     <div className="form-group">
-                                                        <label>ID Type</label>
-                                                        <br />
-                                                        <Select2
-                                                            className='form-control relative'
-                                                            data={idType}
-                                                        />
-                                                    </div>
-                                                    <div className="form-group">
-                                                        <label>Card Number</label>
-                                                        <br />
-                                                        <input
-                                                            className='form-control relative'
-                                                            placeholder="Enter your card number here"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                {/* <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group d-flex align-items-end h-100">
-                            <label className="custom_check me-3">
-                              <input type="checkbox" name="invoice" />
-                              <span className="checkmark" /> Enable tax
-                            </label>
-                            <label className="custom_check">
-                              <input type="checkbox" name="re_invoice" />
-                              <span className="checkmark" /> Recurring Invoice
-                            </label>
-                          </div>
-                        </div> */}
-                                                <div className="col-lg-12">
-                                                    {/* <div className="form-group">
-                            <label>Products</label>
-                            <ul className="form-group-plus css-equal-heights">
-                              <li>
-                                <select className="select">
-                                  <option>Select Product</option>
-                                  <option>Product 1</option>
-                                  <option>Product 2</option>
-                                  <option>Product 3</option>
-                                </select>
-                                <Select2
-                                  // className="w-100"
-                                  data={productOption}
-                                  options={{
-                                    placeholder: "Select Product",
-                                  }}
-                                />
-                              </li>
-                              <li>
-                                <Link
-                                  className="btn btn-primary form-plus-btn"
-                                  to="/add-product"
-                                >
-                                  <i className="fe fe-plus-circle" />
-                                  <FeatherIcon icon="plus-circle" />
-                                </Link>
-                              </li>
-                            </ul>
-                          </div> */}
-                                                </div>
-                                                {/* <div className="col-lg-4 col-md-6 col-sm-12">
-                          <div className="form-group">
-                            <label>Currency</label>
-                            <Select2
-                              // className="w-100"
-                              data={currency}
-                              options={{
-                                placeholder: "Select Currency",
-                              }}
-                            />
-                          </div>
-                        </div> */}
-                                                <div className="col-lg-4 col-md-6 col-sm-12">
-                                                    <div className="form-group">
-                                                        <label>GST Number</label>
+                                                        <label>Name</label>
                                                         <input
                                                             type="text"
                                                             className="form-control"
-                                                            placeholder="Enter GST Number"
+                                                            placeholder="Enter First Name"
                                                         />
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4 col-md-6 col-sm-12">
                                                     <div className="form-group">
-                                                        <label>State</label>
-                                                        <Select2
-                                                            className='form-control relative'
-                                                            data={state}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-4 col-md-6 col-sm-12">
-                                                    <div className="form-group">
-                                                        <label>City PIN</label>
+                                                        <label>Bill Due</label>
                                                         <input
                                                             type="text"
                                                             className="form-control"
-                                                            placeholder="Enter PIN code here"
+                                                            placeholder="Enter First Name"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-lg-4 col-md-6 col-sm-12">
+                                                    <div className="form-group">
+                                                        <label>Due paid till date</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder="Enter First Name"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-lg-4 col-md-6 col-sm-12">
+                                                    <div className="form-group">
+                                                        <label>Recipt No</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder="Enter Phone Number"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-lg-4 col-md-6 col-sm-12">
+                                                    <div className="form-group">
+                                                        <label>Entry Date</label>
+                                                        <div className="cal-icon cal-icon-info">
+                                                            <DatePicker
+                                                                className="datetimepicker form-control"
+                                                                selected={startDate}
+                                                                onChange={(date) => setStartDate(date)}
+                                                            ></DatePicker>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="row align-item-center">
+                                                <div className="col-lg-4 col-md-6 col-sm-12">
+                                                    <div className="form-group">
+                                                        <label>Cash</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder="Enter Website Address"
                                                         />
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="col-lg-12 py-2 col-md-6 col-sm-12 flex justify-end items-center">
-                                            <button
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#add_discount"
-                                                // onClick={AddItemToTable}
-                                                className="btn btn-primary flex items-center gap-2">
-                                                <FeatherIcon icon='plus' />
-                                                Add Product
-                                            </button>
-                                        </div>
-                                        <div className="form-group-item">
-                                            <div className="card-table">
-                                                <div className="card-body add-invoice">
-                                                    <div className="table-responsive">
-                                                        <table className="table table-center table-hover datatable">
-                                                            <thead className="thead-light">
-                                                                <tr>
-                                                                    <th>Product / Service</th>
-                                                                    <th>Type</th>
-                                                                    <th>Purity</th>
-                                                                    <th>Rate</th>
-                                                                    <th>Description</th>
-                                                                    <th>Pcs</th>
-                                                                    <th>Gross.</th>
-                                                                    <th>Net</th>
-                                                                    <th>Amount</th>
-                                                                    <th>Making charges</th>
-                                                                    <th>Action</th>
-                                                                </tr>
-                                                            </thead>
-                                                            {
-                                                                tableItems.map((curr, index) => {
-                                                                    return (
-                                                                        <tbody key={curr.product + index}>
-                                                                            <tr >
-                                                                                <td>{curr.product}</td>
-                                                                                <td>{curr.type}</td>
-                                                                                <td>{curr.purity}</td>
-                                                                                <td>{curr.rate}</td>
-                                                                                <td>{curr.desc}</td>
-                                                                                <td>{curr.pcs}</td>
-                                                                                <td>{curr.gross}</td>
-                                                                                <td>{curr.net}</td>
-                                                                                <td>{curr.amount}</td>
-                                                                                <td>{curr.making_chares}</td>
-                                                                                <td className="d-flex align-items-center">
-                                                                                    <Link
-                                                                                        to="#"
-                                                                                        className="btn-action-icon me-2"
-                                                                                        data-bs-toggle="modal"
-                                                                                        data-bs-target="#add_discount"
-                                                                                    >
-                                                                                        <span>
-                                                                                            {/* <i className="fe fe-edit" /> */}
-                                                                                            <FeatherIcon icon="edit" />
-                                                                                        </span>
-                                                                                    </Link>
-                                                                                    <Link
-                                                                                        to="#"
-                                                                                        className="btn-action-icon"
-                                                                                        data-bs-toggle="modal"
-                                                                                        data-bs-target="#delete_discount"
-                                                                                    >
-                                                                                        <span>
-                                                                                            {/* <i className="fe fe-trash-2" /> */}
-                                                                                            <FeatherIcon icon="trash-2" />
-                                                                                        </span>
-                                                                                    </Link>
-                                                                                </td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    )
-                                                                })
-                                                            }
-                                                        </table>
+                                            <div className="row align-item-center">
+                                                <div className="col-lg-4 col-md-6 col-sm-12">
+                                                    <div className="form-group">
+                                                        <label>Cheque</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder="Enter Website Address"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="row align-item-center">
+                                                <div className="col-lg-4 col-md-6 col-sm-12">
+                                                    <div className="form-group">
+                                                        <label>Card</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder="Enter Website Address"
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
@@ -458,13 +397,7 @@ const Orders = () => {
                                                             <div className="col-lg-4 col-md-12">
                                                                 <div className="form-group">
                                                                     <label>Discount Type</label>
-                                                                    {/* <Select2
-                                    // className="w-100"
-                                    data={percentage}
-                                    options={{
-                                      placeholder: "Percentage(%)",
-                                    }}
-                                  /> */}
+
                                                                 </div>
                                                             </div>
                                                             <div className="col-lg-4 col-md-12">
@@ -491,39 +424,14 @@ const Orders = () => {
                                                         <div className="invoice-total-box">
                                                             <div className="invoice-total-inner">
                                                                 <p>
-                                                                    CGST <span>₹120.00</span>
-                                                                </p>
-                                                                <p>
-                                                                    SGST <span>₹120.00</span>
+                                                                    Taxable Amount <span>₹120.00</span>
                                                                 </p>
                                                                 <p>
                                                                     Discount <span>₹13.20</span>
                                                                 </p>
                                                                 <p>
-                                                                    Payment Mode
+                                                                    Vat <span>₹0.00</span>
                                                                 </p>
-                                                                <div className="form-check">
-                                                                    <input className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" checked />
-                                                                    <label className="form-check-label" >
-                                                                        Card
-                                                                    </label>
-                                                                </div>
-                                                                <div className="form-check">
-                                                                    <input className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" />
-                                                                    <label className="form-check-label" >
-                                                                        Cash
-                                                                    </label>
-                                                                </div>
-                                                                <div className="form-check">
-                                                                    <input className="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" />
-                                                                    <label className="form-check-label" >
-                                                                        Other
-                                                                    </label>
-                                                                </div>
-
-                                                                {/* <p>
-                                  Vat <span>₹0.00</span>
-                                </p> */}
                                                                 <div className="status-toggle justify-content-between">
                                                                     <div className="d-flex align-center">
                                                                         <p>Round Off </p>
@@ -549,33 +457,32 @@ const Orders = () => {
                                                                 </h4>
                                                             </div>
                                                         </div>
-                                                        {/* <div className="form-group">
-                              <label>Signature Name</label>
-                              <input
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter Signature Name"
-                              />
-                            </div> */}
-                                                        {/* <div className="form-group mb-0">
-                              <label>Signature Image</label>
-                              <div className="form-group service-upload service-upload-info mb-0">
-                                <span>
-                                  <i className="fe fe-upload-cloud me-1" />
-                                  <FeatherIcon
-                                    icon="upload-cloud"
-                                    className="me-1"
-                                  />
-                                  Upload Signature
-                                </span>
-                                <input
-                                  type="file"
-                                  multiple=""
-                                  id="image_sign"
-                                />
-                                <div id="frames" />
-                              </div>
-                            </div> */}
+                                                        <div className="form-group">
+                                                            <label>Signature Name</label>
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                placeholder="Enter Signature Name"
+                                                            />
+                                                        </div>
+                                                        <div className="form-group mb-0">
+                                                            <label>Signature Image</label>
+                                                            <div className="form-group service-upload service-upload-info mb-0">
+                                                                <span>
+                                                                    <FeatherIcon
+                                                                        icon="upload-cloud"
+                                                                        className="me-1"
+                                                                    />
+                                                                    Upload Signature
+                                                                </span>
+                                                                <input
+                                                                    type="file"
+                                                                    multiple=""
+                                                                    id="image_sign"
+                                                                />
+                                                                <div id="frames" />
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -597,8 +504,6 @@ const Orders = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Add Tax & Discount Modal */}
                 <div
                     className="modal custom-modal fade"
                     id="add_discount"
@@ -608,7 +513,7 @@ const Orders = () => {
                         <div className="modal-content">
                             <div className="modal-header border-0 pb-0">
                                 <div className="form-header modal-header-title text-start mb-0 align-center">
-                                    <h4 className="mb-0">Add/Edit</h4>
+                                    <h4 className="mb-0">Add Tax &amp; Discount</h4>
                                 </div>
                                 <button
                                     type="button"
@@ -625,9 +530,9 @@ const Orders = () => {
                                 <div className="row">
                                     <div className="col-lg-12 col-md-12">
                                         <div className="form-group">
-                                            <label>Product</label>
+                                            <label>Rate</label>
                                             <input
-                                                type="text"
+                                                type="number"
                                                 className="form-control"
                                                 placeholder={120}
                                             />
@@ -635,85 +540,17 @@ const Orders = () => {
                                     </div>
                                     <div className="col-lg-12 col-md-12">
                                         <div className="form-group">
-                                            <label>Type</label>
-                                            <Select2
-                                                className="form-control w-100"
-                                                data={jewelleryType}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-12 col-md-12">
-                                        <div className="form-group">
-                                            <label>Purity</label>
+                                            <label>Discount Amount</label>
                                             <input
-                                                type="text"
+                                                type="number"
                                                 className="form-control"
                                                 placeholder={0}
                                             />
                                         </div>
                                     </div>
-                                    <div className="col-lg-12 col-md-12">
-                                        <div className="form-group">
-                                            <label>Rate</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder={0}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-12 col-md-12">
-                                        <div className="form-group">
-                                            <label>Description</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder={0}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-12 col-md-12">
-                                        <div className="form-group">
-                                            <label>Number of Pieces(Pcs.)</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder={0}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-12 col-md-12">
-                                        <div className="form-group">
-                                            <label>Amount</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder={0}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-lg-12 col-md-12">
-                                        <div className="form-group">
-                                            <label>Making Charges</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder={0}
-                                            />
-                                        </div>
-                                    </div>
-
-
                                     <div className="col-lg-12 col-md-12">
                                         <div className="form-group mb-0">
                                             <label>Tax</label>
-                                            <Select2
-                                                className="w-100 form-control"
-                                                data={tax}
-                                                options={{
-                                                    placeholder: "Choose Customer",
-                                                }}
-                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -737,9 +574,6 @@ const Orders = () => {
                         </div>
                     </div>
                 </div>
-                {/* /Add Tax & Discount Modal */}
-
-                {/* Delete Items Modal */}
                 <div
                     className="modal custom-modal fade"
                     id="delete_discount"
