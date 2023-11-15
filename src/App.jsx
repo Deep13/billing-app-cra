@@ -14,6 +14,7 @@ import Purity from './Pages/MasterDataPages/Purity'
 import StateCode from './Pages/MasterDataPages/StateCode'
 import TokenEntry from './Pages/MasterDataPages/TokenEntry'
 import InvoiceFormat from './components/InvoiceFormat'
+import DueModule from './Pages/DueModule'
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
           <Route path='customers' element={<Customers />} />
           <Route path='invoices-list' element={<InvoiceList />} />
           <Route path='invoice' element={<InvoiceFormat />} />
+          <Route path='due-module' element={<DueModule />} />
           <Route path='hm-charge' element={<HMCharge />} />
           <Route path='hsn-code' element={<HSNCode />} />
           <Route path='identification-type' element={<IdentificationType />} />

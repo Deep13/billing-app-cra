@@ -116,7 +116,7 @@ const Sidebar = (props) => {
                   <Link
                     to="/daily-expenses"
                     // // className={isSideMenu == "index" ? "subdrop" : "}
-                    className={`${"/daily_balance" === pathName ? "active" : ""} text-black`}
+                    className={`${"/daily-expenses" === pathName ? "active" : ""} text-black`}
                   // onClick={() =>
                   //     toggleSidebar(isSideMenu == "index" ? "" : "index")
                   // }
@@ -201,7 +201,7 @@ const Sidebar = (props) => {
                                     )} */}
                   <Link
                     to="/stock-management"
-                    className={`${"/stock_management" === pathName ? "active" : ""
+                    className={`${"/stock-management" === pathName ? "active" : ""
                       } text-black`}
                   // onClick={() =>
                   //     toggleSidebar(
@@ -214,7 +214,7 @@ const Sidebar = (props) => {
                   </Link>
                   <Link
                     to="/expense-management"
-                    className={`${"/expense_management" === pathName ? "active" : ""
+                    className={`${"/expense-management" === pathName ? "active" : ""
                       } text-black`}
                   // onClick={() =>
                   //     toggleSidebar(
@@ -227,7 +227,7 @@ const Sidebar = (props) => {
                   </Link>
                   <Link
                     to="/buyer-module"
-                    className={`${"/invoice_generation" === pathName ? "active" : ""
+                    className={`${"/buyer-module" === pathName ? "active" : ""
                       } text-black`}
                   // onClick={() =>
                   //     toggleSidebar(
@@ -240,7 +240,7 @@ const Sidebar = (props) => {
                   </Link>
                   <Link
                     to="/purchase-module"
-                    className={`${"/invoice_generation" === pathName ? "active" : ""
+                    className={`${"/purchase-module" === pathName ? "active" : ""
                       } text-black`}
                   // onClick={() =>
                   //     toggleSidebar(
@@ -253,7 +253,7 @@ const Sidebar = (props) => {
                   </Link>
                   <Link
                     to="/invoice-management"
-                    className={`${("/invoice_management" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
+                    className={`${("/invoice-management" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
                       } text-black`}
                   // onClick={() =>
                   //     toggleSidebar(
@@ -266,7 +266,7 @@ const Sidebar = (props) => {
                   </Link>
                   <Link
                     to="/master-data"
-                    className={`${("/invoice_management" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
+                    className={`${("/master-data" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
                       } text-black`}
                   // onClick={() =>
                   //     toggleSidebar(
@@ -279,7 +279,7 @@ const Sidebar = (props) => {
                   </Link>
                   <Link
                     to="/due-management"
-                    className={`${("/due_management" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
+                    className={`${("/due-management" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
                       } text-black`}
                   // onClick={() =>
                   //     toggleSidebar(
@@ -292,7 +292,7 @@ const Sidebar = (props) => {
                   </Link>
                   <Link
                     to="/customers"
-                    className={`${("/due_management" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
+                    className={`${("/customers" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
                       } text-black`}
                   // onClick={() =>
                   //     toggleSidebar(
@@ -303,10 +303,10 @@ const Sidebar = (props) => {
                     {/* <FeatherIcon icon="grid" /> <span>Buyer Creation</span>{" "} */}
                     <FeatherIcon icon="users" /> <span className="text-black">Customers</span>{" "}
                   </Link>
-                 
+
                   <Link
                     to="/orders"
-                    className={`${("/due_management" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
+                    className={`${("/orders" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
                       } text-black`}
                   // onClick={() =>
                   //     toggleSidebar(
@@ -316,6 +316,19 @@ const Sidebar = (props) => {
                   >
                     {/* <FeatherIcon icon="grid" /> <span>Buyer Creation</span>{" "} */}
                     <FeatherIcon icon="users" /> <span className="text-black">Orders</span>{" "}
+                  </Link>
+                  <Link
+                    to="/due-module"
+                    className={`${("/due-module" === pathName) || ("/invoice-paid" === pathName) || ("/invoice-list" === pathName) || ("/invoice-overdue" === pathName) || ("/invoice-draft" === pathName) || ("/invoice-recurring" === pathName) || ("/invoice-cancelled" === pathName) ? "active" : ""
+                      } text-black`}
+                  // onClick={() =>
+                  //     toggleSidebar(
+                  //         isSideMenu == "application" ? "" : "application"
+                  //     )
+                  // }
+                  >
+                    {/* <FeatherIcon icon="grid" /> <span>Buyer Creation</span>{" "} */}
+                    <FeatherIcon icon="paperclip" /> <span className="text-black">Due Management</span>{" "}
                   </Link>
 
                   <Link
