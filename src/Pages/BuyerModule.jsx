@@ -414,6 +414,46 @@ const BuyerModule = () => {
     });
   }
 
+  const insertInvoiceDetails = (data, invoice_id) => {
+    $.ajax({
+      url: 'http://localhost:80/billing_api/invoice.php',
+      type: "POST",
+      data: {
+        method: "insertInvoiceDetails",
+        data: JSON.stringify({data:data, invoice_id}),
+      },
+      success: function (dataClient) {
+        console.log(dataClient)
+      },
+      error: function (request, error) {
+        console.log('Error')
+      }
+    });
+  }
+
+  const insertInvoiceAndThenItems = (data) => {
+    $.ajax({
+      url: 'http://localhost:80/billing_api/invoice.php',
+      type: "POST",
+      data: {
+        method: "insertInvoice",
+        data: JSON.stringify(data),
+      },
+      success: function (dataClient) {
+        console.log(dataClient)
+        let data = JSON.parse(dataClient)
+        if (data && data.length > 0) {
+          console.log(data[1])
+          // store the data Items.
+          insertInvoiceDetails(invoiceData.items, data[1])
+        }
+      },
+      error: function (request, error) {
+        console.log('Error')
+      }
+    });
+  }
+
   const getEinvoice = async (document_number, seller_details) => {
 
 
@@ -433,6 +473,12 @@ const BuyerModule = () => {
       .then(res => res.json())
       .then(data => {
         console.log(data)
+        if (data) {
+          // insert it into the invoice table
+          // initially we cand do anything with this data
+          insertInvoiceAndThenItems({ ...invoiceData, document_number })
+          // insertInvoiceAndItems({data, ...invoiceData, document_number})  // later
+        }
         // insert into the invoice table (this data).
         // then only navigate to invoice page with details.
         // this function  will contain the  insertInvoiceAndInvoiceItem()
